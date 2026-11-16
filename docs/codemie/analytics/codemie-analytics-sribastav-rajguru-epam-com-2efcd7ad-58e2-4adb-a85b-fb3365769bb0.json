@@ -1,0 +1,271 @@
+{
+  "meta": {
+    "generatedAt": "2026-11-16T08:08:01.969Z",
+    "rangeLabel": "all",
+    "agents": [
+      "claude"
+    ],
+    "projectFilter": "all",
+    "totals": {
+      "sessions": 1,
+      "durationMs": 912811,
+      "turns": 10,
+      "files": 2,
+      "netLines": 676,
+      "toolCallsTotal": 10,
+      "toolSuccessRate": 80,
+      "totalCostUSD": 0.7631004600000001,
+      "cacheReadCostUSD": 0.10638396,
+      "pricedSessions": 1
+    },
+    "unpricedModels": [],
+    "estimatedModels": [],
+    "localModels": [],
+    "coverage": [
+      {
+        "agentName": "claude",
+        "total": 1,
+        "priced": 1,
+        "withLog": 1
+      }
+    ],
+    "userEmail": "sribastav_rajguru@epam.com",
+    "periodStart": "2026-11-16T07:52:46.005Z",
+    "periodEnd": "2026-11-16T08:07:58.816Z"
+  },
+  "sessions": [
+    {
+      "sessionId": "2efcd7ad-58e2-4adb-a85b-fb3365769bb0",
+      "agentName": "claude",
+      "provider": "ai-run-sso",
+      "title": "'/home/sribastav/Learning/aws/bedrock/ai-professional-01.pdf' create a markdown doc out of this pdf with all the links/hyperlinks intact",
+      "project": "/home/sribastav/Learning/aws/bedrock",
+      "branch": "main",
+      "startTime": 1794815566005,
+      "durationMs": 912811,
+      "turns": 10,
+      "fileOps": 2,
+      "linesAdded": 676,
+      "linesRemoved": 0,
+      "linesModified": 0,
+      "netLines": 676,
+      "filesChanged": 1,
+      "filesWritten": 1,
+      "filesEdited": 0,
+      "toolCallsTotal": 10,
+      "toolCallsSuccess": 8,
+      "toolCallsFailure": 2,
+      "models": [
+        "claude-sonnet-4-6"
+      ],
+      "languages": [
+        "markdown"
+      ],
+      "tools": [
+        {
+          "toolName": "Bash",
+          "totalCalls": 7,
+          "successCount": 6,
+          "failureCount": 1,
+          "successRate": 85.71428571428571
+        },
+        {
+          "toolName": "Read",
+          "totalCalls": 2,
+          "successCount": 1,
+          "failureCount": 1,
+          "successRate": 50
+        },
+        {
+          "toolName": "Write",
+          "totalCalls": 1,
+          "successCount": 1,
+          "failureCount": 0,
+          "successRate": 100
+        }
+      ],
+      "tokens": {
+        "input": 67,
+        "output": 13366,
+        "cacheRead": 326962,
+        "cacheCreation": 67633,
+        "cacheCreation1h": 67633,
+        "total": 408028
+      },
+      "costUSD": 0.7631004600000001,
+      "cacheReadCostUSD": 0.10638396,
+      "perModelCost": [
+        {
+          "model": "claude-sonnet-4-6",
+          "tokens": {
+            "input": 11,
+            "output": 307,
+            "cacheRead": 50450,
+            "cacheCreation": 16596,
+            "cacheCreation1h": 16596,
+            "total": 67364
+          },
+          "costUSD": 0.119349,
+          "unpriced": false
+        },
+        {
+          "model": "claude-sonnet-4-6",
+          "tokens": {
+            "input": 56,
+            "output": 13059,
+            "cacheRead": 276512,
+            "cacheCreation": 51037,
+            "cacheCreation1h": 51037,
+            "total": 340664
+          },
+          "costUSD": 0.64375146,
+          "unpriced": false
+        }
+      ],
+      "hadLog": true,
+      "agentSessionFile": "/home/sribastav/.claude/projects/-home-sribastav-Learning-aws-bedrock/fd968caf-8f7e-4caf-9725-a52866f16f19.jsonl",
+      "costSeries": [
+        {
+          "t": 1794815592980,
+          "cost": 0.0590445,
+          "tokens": 33575
+        },
+        {
+          "t": 1794815596406,
+          "cost": 0.119349,
+          "tokens": 67364
+        },
+        {
+          "t": 1794815600678,
+          "cost": 0.13371654,
+          "tokens": 101299
+        },
+        {
+          "t": 1794815603896,
+          "cost": 0.15159857999999998,
+          "tokens": 135456
+        },
+        {
+          "t": 1794815607072,
+          "cost": 0.16909187999999997,
+          "tokens": 170033
+        },
+        {
+          "t": 1794815612480,
+          "cost": 0.18912221999999998,
+          "tokens": 204935
+        },
+        {
+          "t": 1794815615942,
+          "cost": 0.21408143999999998,
+          "tokens": 241118
+        },
+        {
+          "t": 1794815624578,
+          "cost": 0.23871924,
+          "tokens": 278287
+        },
+        {
+          "t": 1794815751504,
+          "cost": 0.5487631500000001,
+          "tokens": 343009
+        },
+        {
+          "t": 1794815757688,
+          "cost": 0.7631004600000001,
+          "tokens": 408028
+        }
+      ],
+      "costSource": "native-estimate",
+      "costBasis": "standard-api-tokens",
+      "dispatchesComplete": true,
+      "rootOwnCostUSD": 0.7045776,
+      "unlinkedCostUSD": 0,
+      "unlinkedAgentIds": [],
+      "observedEnd": 1794816478816,
+      "rootOwnTokens": {
+        "input": 67,
+        "output": 13366,
+        "cacheRead": 326962,
+        "cacheCreation": 67633,
+        "cacheCreation1h": 67633,
+        "total": 408028
+      },
+      "unlinkedTokens": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheCreation": 0,
+        "cacheCreation1h": 0,
+        "total": 0
+      },
+      "modelTimeline": [
+        {
+          "t": 1794815592980,
+          "model": "claude-sonnet-4-6",
+          "costUSD": 0.0590445,
+          "tokens": 33575
+        },
+        {
+          "t": 1794815596406,
+          "model": "claude-sonnet-4-6",
+          "costUSD": 0.0603045,
+          "tokens": 33789
+        },
+        {
+          "t": 1794815600678,
+          "model": "claude-sonnet-4-6",
+          "costUSD": 0.01436754,
+          "tokens": 33935
+        },
+        {
+          "t": 1794815603896,
+          "model": "claude-sonnet-4-6",
+          "costUSD": 0.01788204,
+          "tokens": 34157
+        },
+        {
+          "t": 1794815607072,
+          "model": "claude-sonnet-4-6",
+          "costUSD": 0.0174933,
+          "tokens": 34577
+        },
+        {
+          "t": 1794815612480,
+          "model": "claude-sonnet-4-6",
+          "costUSD": 0.02003034,
+          "tokens": 34902
+        },
+        {
+          "t": 1794815615942,
+          "model": "claude-sonnet-4-6",
+          "costUSD": 0.02495922,
+          "tokens": 36183
+        },
+        {
+          "t": 1794815624578,
+          "model": "claude-sonnet-4-6",
+          "costUSD": 0.0246378,
+          "tokens": 37169
+        },
+        {
+          "t": 1794815751504,
+          "model": "claude-sonnet-4-6",
+          "costUSD": 0.31004391,
+          "tokens": 64722
+        },
+        {
+          "t": 1794815757688,
+          "model": "claude-sonnet-4-6",
+          "costUSD": 0.21433731,
+          "tokens": 65019
+        }
+      ],
+      "routedTurnsPct": 0,
+      "skillInvocations": [],
+      "agentInvocations": [],
+      "commandInvocations": [],
+      "sessionSource": "Pure chat"
+    }
+  ]
+}

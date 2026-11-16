@@ -1,0 +1,128 @@
+</main>
+</div>
+
+<script>
+(function () {
+  var KEY = '{{STORAGE_PREFIX}}-toc-open';
+  var list = document.getElementById('toc-list');
+  var chapters = document.querySelectorAll('main .chapter');
+  var links = [];
+  var items = [];
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; }
+  }
+  function save() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(items.filter(function (i) { return i.li.classList.contains('open'); }).map(function (i) { return i.id; })));
+    } catch (e) {}
+  }
+  function setOpen(item, open) {
+    item.li.classList.toggle('open', open);
+    item.btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  var stored = load();
+
+  chapters.forEach(function (ch) {
+    var h2 = ch.querySelector('h2');
+    if (!ch.id || !h2) return;
+    var li = document.createElement('li');
+    li.className = 'ch';
+    var row = document.createElement('div');
+    row.className = 'row';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tgl';
+    btn.setAttribute('aria-label', 'Toggle sections of ' + h2.textContent);
+    var a = document.createElement('a');
+    a.href = '#' + ch.id;
+    a.textContent = h2.textContent;
+    row.appendChild(btn);
+    row.appendChild(a);
+    li.appendChild(row);
+    var subs = ch.querySelectorAll('h3[id]');
+    var hasSubs = false;
+    if (subs.length) {
+      var ul = document.createElement('ul');
+      subs.forEach(function (h3) {
+        if (h3.closest('.checkpoint, .recap')) return;
+        var l = document.createElement('li');
+        var sa = document.createElement('a');
+        sa.href = '#' + h3.id;
+        sa.textContent = h3.textContent;
+        l.appendChild(sa);
+        ul.appendChild(l);
+        links.push({ el: h3, a: sa, li: li });
+        hasSubs = true;
+      });
+      if (hasSubs) li.appendChild(ul);
+    }
+    var item = { id: ch.id, li: li, btn: btn };
+    if (!hasSubs) btn.style.visibility = 'hidden';
+    items.push(item);
+    setOpen(item, hasSubs && stored.indexOf(ch.id) !== -1);
+    btn.addEventListener('click', function () {
+      setOpen(item, !li.classList.contains('open'));
+      save();
+    });
+    links.push({ el: ch, a: a, li: li, isChapter: true, item: item });
+    list.appendChild(li);
+  });
+
+  document.getElementById('toc-expand').addEventListener('click', function () {
+    items.forEach(function (i) { if (i.li.querySelector('ul')) setOpen(i, true); });
+    save();
+  });
+  document.getElementById('toc-collapse').addEventListener('click', function () {
+    items.forEach(function (i) { setOpen(i, false); });
+    save();
+  });
+
+  var narrow = window.matchMedia('(max-width: 62rem)');
+  var details = document.getElementById('toc-details');
+  function syncOpen() { details.open = !narrow.matches; }
+  syncOpen();
+  if (narrow.addEventListener) narrow.addEventListener('change', syncOpen);
+
+  var lastCh = null;
+  function spy() {
+    var y = 120, cur = null, curCh = null;
+    links.forEach(function (l) {
+      var top = l.el.getBoundingClientRect().top;
+      if (top <= y) { if (l.isChapter) curCh = l; else cur = l; }
+    });
+    document.querySelectorAll('.toc .ch').forEach(function (n) { n.classList.remove('active'); });
+    document.querySelectorAll('.toc a.current').forEach(function (n) { n.classList.remove('current'); });
+    if (curCh) {
+      curCh.li.classList.add('active');
+      if (curCh !== lastCh) {
+        lastCh = curCh;
+        if (curCh.item.li.querySelector('ul')) { setOpen(curCh.item, true); save(); }
+      }
+    }
+    if (cur && curCh && curCh.li === cur.li) cur.a.classList.add('current');
+  }
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () { spy(); ticking = false; });
+  }, { passive: true });
+  spy();
+
+  var HKEY = '{{STORAGE_PREFIX}}-toc-hidden';
+  var layout = document.getElementById('layout');
+  var hideBtn = document.getElementById('toc-hide');
+  var showBtn = document.getElementById('toc-show');
+  function setHidden(hidden) {
+    layout.classList.toggle('toc-hidden', hidden);
+    hideBtn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+    showBtn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+    try { localStorage.setItem(HKEY, hidden ? '1' : '0'); } catch (e) {}
+  }
+  try { if (localStorage.getItem(HKEY) === '1') setHidden(true); } catch (e) {}
+  hideBtn.addEventListener('click', function () { setHidden(true); showBtn.focus(); });
+  showBtn.addEventListener('click', function () { setHidden(false); hideBtn.focus(); });
+})();
+</script>
