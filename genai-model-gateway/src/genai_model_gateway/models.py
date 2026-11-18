@@ -19,4 +19,5 @@ class GenerateResponse(BaseModel):
     input_tokens: int
     output_tokens: int
     latency_ms: float
+    fallback_used: bool = False  # True when a fallback (not the primary) served the request
     degraded: bool = False  # True when every model in the list failed

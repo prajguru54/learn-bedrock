@@ -1,6 +1,6 @@
 # Plan: Project 1 — genai-model-gateway
 
-**Status:** Not started  
+**Status:** M1–M6 complete  
 **Study guide source:** `docs/aip-c01-domain1-study-guide.html` → "Project 1: A resilient model gateway"  
 **Build after:** Chapters 1 and 2 (Tasks 1.1 and 1.2)
 
@@ -264,6 +264,10 @@ Write tests in `tests/test_breaker.py`:
 ### Milestone 6 — Cost attribution and dashboard
 **Exam skills:** 1.2.1 (evidence), 1.2.3 (operational visibility)  
 **AWS cost:** CloudWatch custom metrics ~$0.30/metric/month
+
+> **Concept reference:** New to CloudWatch metrics, dimensions, alarms, or SNS topics/subscriptions?
+> Read [`docs/concepts/metrics_and_alarms.md`](../../docs/concepts/metrics_and_alarms.md)
+> before starting this milestone — it explains how all these terms fit together using this gateway as the example.
 
 #### Why this matters — a concrete scenario
 

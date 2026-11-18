@@ -38,7 +38,7 @@ def invoke(request: GenerateRequest) -> GenerateResponse:
         {"role": m.role, "content": [{"text": m.content}]} for m in request.messages
     ]
 
-    for model_id in [cfg.model] + cfg.fallbacks:
+    for idx, model_id in enumerate([cfg.model] + cfg.fallbacks):
         # Fail-open: if DynamoDB is down, allow the call rather than blocking everything.
         try:
             if not breaker.is_allowed(model_id):
@@ -72,6 +72,7 @@ def invoke(request: GenerateRequest) -> GenerateResponse:
             input_tokens=usage["inputTokens"],
             output_tokens=usage["outputTokens"],
             latency_ms=round(latency_ms, 1),
+            fallback_used=(idx > 0),
             degraded=False,
         )
 
