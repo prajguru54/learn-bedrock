@@ -1,5 +1,6 @@
 import json
 import os
+import threading
 import time
 from dataclasses import dataclass
 
@@ -35,6 +36,7 @@ class _Cache:
         self._token: str | None = None
         self._profile: dict | None = None
         self._fetched_at: float = 0.0
+        self._lock = threading.Lock()
 
     def _start_session(self) -> None:
         response = self._client.start_configuration_session(
@@ -58,8 +60,9 @@ class _Cache:
         self._fetched_at = time.monotonic()
 
     def get_task_config(self, task: str) -> TaskConfig:
-        if self._profile is None or (time.monotonic() - self._fetched_at) > _CACHE_TTL:
-            self._poll()
+        with self._lock:
+            if self._profile is None or (time.monotonic() - self._fetched_at) > _CACHE_TTL:
+                self._poll()
         task_cfg = self._profile["tasks"][task]  # type: ignore[index]
         return TaskConfig(
             model=task_cfg["models"][0], # pick the first model in the list

@@ -19,3 +19,4 @@ class GenerateResponse(BaseModel):
     input_tokens: int
     output_tokens: int
     latency_ms: float
+    degraded: bool = False  # True when every model in the list failed
