@@ -13,6 +13,11 @@ logger = logging.getLogger(__name__)
 app = FastAPI(title="GenAI Model Gateway", version="0.1.0")
 
 
+@app.get("/health")
+def health() -> dict:
+    return {"status": "ok"}
+
+
 @app.post("/v1/generate", response_model=GenerateResponse)
 def generate(
     request: GenerateRequest, response: Response, background_tasks: BackgroundTasks

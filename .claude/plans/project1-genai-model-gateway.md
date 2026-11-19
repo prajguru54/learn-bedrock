@@ -348,6 +348,12 @@ BreakerOpen > 10 min        →  SNS → email/Slack  (a model has been down for
 **Exam skill:** 1.1.3 (standardized, repeatable components)  
 **AWS cost:** ECS Fargate task + ALB are the ongoing costs — stop when not testing
 
+> **Concept reference:** New to ECS task roles, how boto3 picks up credentials on Fargate,
+> or why `bedrock:InvokeModel` is the invoke action (not a read)?
+> Read [`docs/concepts/ecs_credentials.md`](../../docs/concepts/ecs_credentials.md)
+> before starting this milestone — it explains the credential injection mechanism,
+> the boto3 provider chain, and the two-role model (task role vs execution role).
+
 #### Why this matters — a concrete scenario
 
 Right now the gateway runs only on your laptop with `uvicorn`. If your machine sleeps, the
@@ -419,12 +425,205 @@ on any account with one deploy command."
 
 #### Implementation checklist
 
-1. **Dockerfile** — Python slim base, non-root user, `uv` for deps, health check endpoint `GET /health`
-2. **ECS cluster + Fargate service** — 1 task minimum, auto-scale on request count
-3. **Task role** — `bedrock:InvokeModel` scoped to approved model ARNs only (no wildcard)
-4. **ALB + target group + listener** — public entry point routing to the ECS service
-5. **IaC resources** — AppConfig application/environment/profile, DynamoDB table (on-demand, TTL enabled), CloudWatch log group/dashboard/alarms, SNS topic
-6. Deploy, send test traffic, confirm dashboard fills, confirm cost tags appear in Cost Explorer
+---
+
+##### Step 1 — Dockerfile + health endpoint
+
+- Add `GET /health` to `main.py` (ALB and ECS health checks both hit this route)
+- Write `Dockerfile`:
+  - Base: `python:3.12-slim`
+  - Create non-root user `appuser`
+  - Use `uv export --no-emit-project` → `requirements.txt` → `uv pip install --system`
+    (avoids a `.venv` inside the container — the container is already isolated)
+  - `HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3`
+  - `CMD ["python", "-m", "uvicorn", "genai_model_gateway.main:app", "--host", "0.0.0.0", "--port", "8000"]`
+- Build and test locally:
+  ```bash
+  sudo docker build -t genai-model-gateway:local .
+  sudo docker run -d --name gw-test -p 8002:8000 -e AWS_DEFAULT_REGION=ap-southeast-2 genai-model-gateway:local
+  curl -s http://localhost:8002/health   # expect {"status":"ok"}
+  sudo docker rm -f gw-test
+  ```
+
+---
+
+##### Step 2 — Push image to ECR
+
+```bash
+export AWS_REGION=ap-southeast-2
+export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+export ECR_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/genai-model-gateway
+
+# Create the repository
+aws ecr create-repository \
+  --repository-name genai-model-gateway \
+  --image-tag-mutability IMMUTABLE \
+  --image-scanning-configuration scanOnPush=true \
+  --region $AWS_REGION
+
+# Authenticate, tag, push
+aws ecr get-login-password --region $AWS_REGION | \
+  sudo docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+sudo docker tag genai-model-gateway:local $ECR_URI:v1
+sudo docker push $ECR_URI:v1
+```
+
+---
+
+##### Step 3 — IAM roles
+
+Two roles are required. See [`docs/concepts/ecs_credentials.md`](../../docs/concepts/ecs_credentials.md)
+for a full explanation of why both exist and how boto3 picks up credentials automatically.
+
+**Task execution role** (ECS agent — pulls image, writes logs):
+```bash
+aws iam create-role --role-name ecsTaskExecutionRole \
+  --assume-role-policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ecs-tasks.amazonaws.com"},"Action":"sts:AssumeRole"}]}'
+aws iam attach-role-policy --role-name ecsTaskExecutionRole \
+  --policy-arn arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+```
+
+**Task role** (application code — Bedrock, DynamoDB, AppConfig, CloudWatch):
+- Policy: `GenAIGatewayTaskPolicy` — scoped to the 3 inference profile ARNs + Mistral fallback,
+  the `model-gateway-breaker` DynamoDB table, the `routing-profile` AppConfig profile,
+  and `cloudwatch:PutMetricData` with a namespace condition (`GenAIGateway` only).
+- Role: `genai-gateway-task-role` with `ecs-tasks.amazonaws.com` trust + `aws:SourceAccount` condition.
+
+---
+
+##### Step 4 — ECS cluster, task definition, and Fargate service
+
+**CloudWatch log group** (container stdout goes here):
+```bash
+aws logs create-log-group --log-group-name /ecs/genai-model-gateway --region $AWS_REGION
+```
+
+**ECS cluster:**
+```bash
+aws ecs create-cluster --cluster-name genai-gateway --region $AWS_REGION
+```
+
+**Task definition** — key fields:
+- Network mode: `awsvpc` (required for Fargate)
+- CPU: `256` (0.25 vCPU) / Memory: `512` MB
+- Task role: `genai-gateway-task-role`
+- Execution role: `ecsTaskExecutionRole`
+- Container image: `$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/genai-model-gateway:v1`
+- Port: `8000`
+- Environment: `AWS_DEFAULT_REGION=ap-southeast-2`
+- Log driver: `awslogs` → group `/ecs/genai-model-gateway`, prefix `gateway`
+
+**Fargate service:**
+```bash
+# Get default VPC and two subnets
+VPC_ID=$(aws ec2 describe-vpcs --filters Name=isDefault,Values=true \
+  --query "Vpcs[0].VpcId" --output text --region $AWS_REGION)
+SUBNET_IDS=$(aws ec2 describe-subnets --filters Name=vpc-id,Values=$VPC_ID \
+  --query "Subnets[:2].SubnetId" --output text --region $AWS_REGION | tr '\t' ',')
+
+# Task security group — port 8000 (later tightened to ALB SG only)
+SG_ID=$(aws ec2 create-security-group --group-name genai-gateway-task-sg \
+  --description "ECS task SG" --vpc-id $VPC_ID --region $AWS_REGION --query GroupId --output text)
+aws ec2 authorize-security-group-ingress --group-id $SG_ID \
+  --protocol tcp --port 8000 --cidr 0.0.0.0/0 --region $AWS_REGION
+
+aws ecs create-service \
+  --cluster genai-gateway \
+  --service-name genai-model-gateway \
+  --task-definition genai-model-gateway \
+  --desired-count 1 \
+  --launch-type FARGATE \
+  --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],securityGroups=[$SG_ID],assignPublicIp=ENABLED}" \
+  --region $AWS_REGION
+```
+
+Verify the task is running:
+```bash
+aws ecs describe-services --cluster genai-gateway --services genai-model-gateway \
+  --region $AWS_REGION \
+  --query "services[0].{status:status,running:runningCount,desired:desiredCount}"
+```
+
+---
+
+##### Step 5 — ALB, target group, and listener
+
+This step wires public traffic to the running ECS task. Five sub-steps, all in the console.
+Every sub-step matters — skipping one breaks the chain.
+
+```
+Internet → ALB SG (port 80) → ALB → Target Group (port 8000, type=ip) → Task IP:8000
+                                                                              ↑
+                                                        Task SG: allow 8000 from ALB SG only
+```
+
+**Why target type `ip` and not `instance`:** Fargate tasks use `awsvpc` networking — each
+task gets its own private IP attached directly to the VPC. There is no EC2 instance behind
+it. The ALB registers the task's IP in the target group directly.
+
+**Sub-step 1 — ALB security group**
+EC2 → Security Groups → Create security group
+- Name: `genai-gateway-alb-sg`
+- VPC: your default VPC
+- Inbound: Type **HTTP**, Port **80**, Source **0.0.0.0/0**
+
+**Sub-step 2 — Target group**
+EC2 → Target Groups → Create target group
+- Target type: **IP addresses** (not Instance)
+- Name: `genai-gateway-tg`
+- Protocol: **HTTP**, Port: **8000**
+- VPC: your default VPC
+- Health check path: `/health`
+- Healthy threshold: **2**, Interval: **30s**
+- Next → skip manual registration → Create
+
+**Sub-step 3 — Application Load Balancer**
+EC2 → Load Balancers → Create load balancer → Application Load Balancer
+- Name: `genai-gateway-alb`
+- Scheme: **Internet-facing**, IP type: **IPv4**
+- VPC: your default VPC, tick **both subnets**
+- Security groups: remove default, add **`genai-gateway-alb-sg`**
+- Listener: HTTP port **80**, forward to **`genai-gateway-tg`**
+- Create
+
+**Sub-step 4 — Tighten the task security group**
+EC2 → Security Groups → `genai-gateway-task-sg` → Edit inbound rules
+- Delete the existing rule (port 8000 from 0.0.0.0/0)
+- Add: Type **Custom TCP**, Port **8000**, Source → **`genai-gateway-alb-sg`**
+- Save
+
+This ensures the container is unreachable from the internet directly — only the ALB can
+talk to it on port 8000.
+
+**Sub-step 5 — Attach the target group to the ECS service**
+ECS → Clusters → `genai-gateway` → Services → `genai-model-gateway` → Update
+- Load balancing → Add load balancer:
+  - Type: **Application Load Balancer**
+  - Load balancer: **`genai-gateway-alb`**
+  - Container: **`gateway 8000`**
+  - Target group: **`genai-gateway-tg`**
+- Update
+
+ECS deregisters the old task and registers the replacement with the ALB automatically.
+Wait ~60 seconds for `running: 1` to return, then proceed to the smoke test.
+
+---
+
+##### Step 6 — Smoke test
+
+```bash
+# Get the ALB DNS name
+ALB_DNS=$(aws elbv2 describe-load-balancers \
+  --names genai-gateway-alb --region $AWS_REGION \
+  --query "LoadBalancers[0].DNSName" --output text)
+
+curl -s http://$ALB_DNS/health
+# expect: {"status":"ok"}
+
+curl -s -X POST http://$ALB_DNS/v1/generate \
+  -H "Content-Type: application/json" \
+  -d '{"task":"summarize","messages":[{"role":"user","content":"Summarise: AWS ECS runs containers."}]}'
+```
 
 ---
 
