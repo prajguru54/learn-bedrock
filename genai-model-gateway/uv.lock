@@ -95,6 +95,7 @@ source = { editable = "." }
 dependencies = [
     { name = "boto3" },
     { name = "fastapi" },
+    { name = "python-dotenv" },
     { name = "uvicorn", extra = ["standard"] },
 ]
 
@@ -102,6 +103,7 @@ dependencies = [
 requires-dist = [
     { name = "boto3", specifier = ">=1.34" },
     { name = "fastapi", specifier = ">=0.115" },
+    { name = "python-dotenv", specifier = ">=1.0" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.30" },
 ]
 

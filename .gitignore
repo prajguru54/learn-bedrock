@@ -10,5 +10,11 @@ wheels/
 
 # Virtual environments
 .venv
+
+# CDK build output
+cdk.out/
+
+# Local environment variables — never commit, copy from .env.example
+.env
 .local/handoffs/
 docs/codemie/

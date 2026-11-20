@@ -50,8 +50,8 @@ def invoke(request: GenerateRequest) -> GenerateResponse:
         try:
             response = _call_model(model_id, messages, max_tokens, cfg.temperature)
             latency_ms = (time.monotonic() - t0) * 1000
-        except (ClientError, ReadTimeoutError):
-            # Bedrock call failed — record and try next model.
+        except Exception as exc:
+            logger.warning("Bedrock call failed — model=%s type=%s error=%s", model_id, type(exc).__name__, exc)
             try:
                 breaker.record_failure(model_id)
             except Exception:

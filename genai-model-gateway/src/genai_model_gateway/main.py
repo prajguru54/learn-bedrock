@@ -1,3 +1,7 @@
+from dotenv import load_dotenv
+
+load_dotenv()  # Must run before any import that reads os.environ (config.py reads at module level)
+
 import json
 import logging
 
