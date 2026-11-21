@@ -60,6 +60,7 @@ class GenAIGatewayStack(cdk.Stack):
             self, "AppConfigEnv",
             application_id=appconfig_app.ref,
             name="dev",
+            deletion_protection_check="BYPASS",
         )
 
         appconfig_profile = appconfig.CfnConfigurationProfile(
@@ -67,6 +68,7 @@ class GenAIGatewayStack(cdk.Stack):
             application_id=appconfig_app.ref,
             name="routing-profile",
             location_uri="hosted",
+            deletion_protection_check="BYPASS",
         )
 
         config_path = os.path.join(os.path.dirname(__file__), "..", "config", "routing_profile.json")
