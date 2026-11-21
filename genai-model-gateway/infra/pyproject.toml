@@ -1,0 +1,19 @@
+[project]
+name = "genai-model-gateway-infra"
+version = "0.1.0"
+description = "CDK infrastructure for genai-model-gateway"
+authors = [
+    { name = "Sribastav Rajguru", email = "prajguru54@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "aws-cdk-lib>=2.170.0",
+    "constructs>=10.0.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["stacks"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

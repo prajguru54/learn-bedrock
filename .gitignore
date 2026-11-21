@@ -6,6 +6,15 @@ dist/
 wheels/
 *.egg-info
 
+.codemie/analytics/
+
 # Virtual environments
 .venv
-/local
+
+# CDK build output
+cdk.out/
+
+# Local environment variables — never commit, copy from .env.example
+.env
+.local/handoffs/
+docs/codemie/

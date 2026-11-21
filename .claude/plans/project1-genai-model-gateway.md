@@ -1,6 +1,6 @@
 # Plan: Project 1 — genai-model-gateway
 
-**Status:** Not started  
+**Status:** M1–M6 complete  
 **Study guide source:** `docs/aip-c01-domain1-study-guide.html` → "Project 1: A resilient model gateway"  
 **Build after:** Chapters 1 and 2 (Tasks 1.1 and 1.2)
 
@@ -197,7 +197,54 @@ AppConfig profile shape (example):
 **Exam skill:** 1.2.3  
 **AWS cost:** DynamoDB on-demand pricing (negligible for dev traffic)
 
-Add all resilience layers in one milestone:
+#### Why this matters — a concrete scenario
+
+It's Monday 9 AM. All three internal tools hit Bedrock at once. Amazon throttles your primary model (`nova-micro`). Without M5, every request returns a 500. With M5, requests silently succeed using a fallback model — and once the primary is throttled enough times, the gateway stops wasting time even trying it.
+
+#### Five layers, one story
+
+Imagine a request comes in for `summarize`:
+
+**1. Retry** *(already wired — Boto3 adaptive)*  
+Your call gets a `ThrottlingException`. Boto3 waits 0.5s, tries again. Waits 1s, tries again. Gives up after 3 attempts.
+
+**2. Timeout**  
+Instead of waiting 30 seconds for Bedrock to respond (or never respond), you impose a hard 10-second cap per attempt. The retry still happens, but each attempt is bounded.
+
+**3. Ordered fallback**  
+AppConfig says: `"models": ["nova-micro", "nova-lite"]`. If nova-micro fails even after retries, the gateway tries nova-lite. The caller gets a successful response — they never knew the primary failed.
+
+**4. Circuit breaker** *(the new DynamoDB piece)*  
+After nova-micro fails 5 times in a row, the breaker **opens**. For the next 60 seconds, the gateway *skips* nova-micro entirely and goes straight to nova-lite. After 60 seconds, it sends **one probe** to nova-micro. If it succeeds, the breaker **closes** again.
+
+```
+Closed → (5 failures) → Open → (60s cool-down) → Half-open → (1 probe)
+   ↑                                                               |
+   └──────────── success ─────────────────────────────────────────┘
+                         or ← failure → back to Open
+```
+
+Why DynamoDB and not in-memory? Because you'll eventually run multiple containers. A breaker stored in memory is per-process. DynamoDB makes it **shared state** — if container A sees nova-micro fail 5 times, container B also stops trying it.
+
+**5. Degraded response**  
+If nova-micro is open AND nova-lite also fails, instead of a 500 you return:
+```json
+{ "degraded": true, "error": "all models exhausted", "content": "" }
+```
+The caller can handle this gracefully (show "try again later") rather than crashing on an unexpected 500.
+
+#### What changes
+
+| File | What changes |
+|---|---|
+| `bedrock.py` | Add timeout + fallback loop |
+| `breaker.py` | New — DynamoDB-backed circuit breaker |
+| `main.py` | Return degraded response shape on total failure |
+| `models.py` | Add `degraded: bool` to `GenerateResponse` |
+| AWS | Create a DynamoDB table for breaker state |
+
+#### Implementation checklist
+
 1. **Retries with exponential backoff** — Boto3 `Config(retries={"max_attempts": 3, "mode": "adaptive"})` for `ThrottlingException`
 2. **Timeout** — per-request hard timeout before retries exhaust
 3. **Ordered fallback** — on non-retryable failure or exhausted retries, try next model in the list
@@ -218,6 +265,71 @@ Write tests in `tests/test_breaker.py`:
 **Exam skills:** 1.2.1 (evidence), 1.2.3 (operational visibility)  
 **AWS cost:** CloudWatch custom metrics ~$0.30/metric/month
 
+> **Concept reference:** New to CloudWatch metrics, dimensions, alarms, or SNS topics/subscriptions?
+> Read [`docs/concepts/metrics_and_alarms.md`](../../docs/concepts/metrics_and_alarms.md)
+> before starting this milestone — it explains how all these terms fit together using this gateway as the example.
+
+#### Why this matters — a concrete scenario
+
+Finance asks: "Which tool spent the most on Bedrock last week?" Right now, every call goes
+through the same model ID. Cost Explorer shows one Bedrock line item with no breakdown.
+You cannot answer the question without reading logs and writing a script.
+
+After M6, Cost Explorer shows spend split by `tool` tag (summarizer / drafter / faq-bot),
+and your CloudWatch dashboard shows token usage, fallback rate, and latency — all updated
+in real time, no log parsing needed.
+
+#### How it works
+
+**Application inference profiles** are AWS-managed wrappers around a foundation model.
+You create one per tool (e.g. `gateway-summarizer`), attach resource tags, and use the
+profile's ARN in `converse` calls instead of the raw model ID. Bedrock forwards the call
+to the same model but records the spend against the profile's tags.
+
+```
+Before:
+  converse(modelId="amazon.nova-micro-v1:0")
+         ↓
+  Cost Explorer: $X on "amazon.nova-micro-v1:0"  ← no tool breakdown
+
+After:
+  converse(modelId="arn:aws:bedrock:...:application-inference-profile/gateway-summarizer")
+         ↓
+  Cost Explorer: $X tagged tool=summarizer, env=dev  ← per-tool breakdown
+```
+
+**Custom CloudWatch metrics** are numbers you push from code on every request. Unlike logs
+(which are free-text), metrics are queryable and alarmable. You emit them with a single
+`put_metric_data` call and they appear on a dashboard within seconds.
+
+```
+Request completes
+    │
+    ├─ emit InputTokens (dimension: task=summarize, model=nova-micro)
+    ├─ emit OutputTokens
+    ├─ emit RequestLatencyMs
+    └─ emit FallbackInvoked=1 (only when fallback was used)
+```
+
+**Alarms** watch a metric and fire an SNS notification when a threshold is crossed.
+Two alarms cover the most important failure signals:
+
+```
+Error rate > 5% over 5 min  →  SNS → email/Slack  (service is degraded)
+BreakerOpen > 10 min        →  SNS → email/Slack  (a model has been down for a while)
+```
+
+#### What changes
+
+| File | What changes |
+|---|---|
+| `bedrock.py` | Use inference profile ARN instead of raw model ID |
+| `metrics.py` | New — CloudWatch `put_metric_data` helper |
+| `main.py` | Call `metrics.py` after every request |
+| AWS | Create 3 inference profiles, 1 dashboard, 2 alarms, 1 SNS topic |
+
+#### Implementation checklist
+
 1. **Application inference profiles** — create one per tool (summarizer, drafter, faq-bot), tag each with `tool` and `env`
 2. **Route calls through profiles** — use the profile ARN instead of the raw model ID in `converse` calls
 3. **Custom metrics** — emit to CloudWatch on every call:
@@ -236,36 +348,357 @@ Write tests in `tests/test_breaker.py`:
 **Exam skill:** 1.1.3 (standardized, repeatable components)  
 **AWS cost:** ECS Fargate task + ALB are the ongoing costs — stop when not testing
 
-Write the Dockerfile and IaC (`infra/`):
+> **Concept reference:** New to ECS task roles, how boto3 picks up credentials on Fargate,
+> or why `bedrock:InvokeModel` is the invoke action (not a read)?
+> Read [`docs/concepts/ecs_credentials.md`](../../docs/concepts/ecs_credentials.md)
+> before starting this milestone — it explains the credential injection mechanism,
+> the boto3 provider chain, and the two-role model (task role vs execution role).
 
-**Dockerfile:**
-- Python slim base, non-root user, `uv` for deps
-- Health check endpoint `GET /health`
+#### Why this matters — a concrete scenario
 
-**Terraform or CDK resources:**
-- ECS cluster + Fargate service (1 task minimum, auto-scale on request count)
-- Task role with `bedrock:InvokeModel` limited to approved model ARNs only
-- ALB + target group + listener
-- AppConfig application, environment, configuration profile, deployment strategy
-- DynamoDB table (circuit breaker state, on-demand, TTL enabled)
-- CloudWatch log group, dashboard, alarms
-- SNS topic for alarm notifications
+Right now the gateway runs only on your laptop with `uvicorn`. If your machine sleeps, the
+service goes down. If a second developer joins, they can't run the same environment. If you
+need two copies for load balancing, there's no way to do it.
 
-Deploy, send test traffic, confirm dashboard fills, confirm cost tags appear in Cost Explorer.
+After M7, the service lives in AWS. Any developer can deploy it from scratch with one
+command. ECS handles restarts, ALB handles traffic distribution, and the task role ensures
+the container can only call the specific Bedrock models it's supposed to — nothing else.
+
+#### How it works
+
+**Dockerfile** packages the app into an image. The key production practices:
+
+```
+FROM python:3.12-slim          ← small base, fewer CVEs
+RUN useradd -m appuser         ← non-root user (security baseline)
+COPY --chown=appuser . .
+RUN uv sync --frozen           ← exact versions from uv.lock
+USER appuser
+CMD ["uvicorn", "genai_model_gateway.main:app", "--host", "0.0.0.0"]
+```
+
+**ECS Fargate** runs the container without you managing servers. You say "I want 1 copy of
+this container running, with 0.5 vCPU and 1 GB RAM" and AWS handles the rest.
+
+```
+ALB (public endpoint: api.internal/v1/generate)
+  │
+  └─► Target Group
+          │
+          ├─► ECS Task (container 1)  ← Fargate manages the host
+          └─► ECS Task (container 2)  ← auto-scaled when request count rises
+```
+
+**Task role** is an IAM role attached to the container. It replaces hardcoded credentials.
+The container calls `boto3.client("bedrock-runtime")` and boto3 automatically picks up the
+role's temporary credentials from the ECS metadata endpoint.
+
+The role policy is scoped tightly — it lists only the approved model ARNs:
+
+```json
+{
+  "Effect": "Allow",
+  "Action": "bedrock:InvokeModel",
+  "Resource": [
+    "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+    "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-lite-v1:0"
+  ]
+}
+```
+
+A wildcard (`"Resource": "*"`) would let the container call any model on your account —
+including expensive ones. The narrow policy is both safer and cheaper.
+
+**Infrastructure as Code (IaC)** writes all of the above as code (Terraform or CDK).
+Every resource — the ECS cluster, the ALB, the DynamoDB table, the IAM role — is declared
+in files, committed to git, and reproducible. "It works on my account" becomes "it works
+on any account with one deploy command."
+
+#### What changes
+
+| File | What changes |
+|---|---|
+| `Dockerfile` | New — production image with non-root user, health check |
+| `src/.../main.py` | Add `GET /health` endpoint |
+| `infra/` | New — Terraform/CDK for all AWS resources |
+| AWS | ECS cluster + Fargate service, ALB, task role, DynamoDB, CloudWatch, SNS |
+
+#### Implementation checklist
+
+---
+
+##### Step 1 — Dockerfile + health endpoint
+
+- Add `GET /health` to `main.py` (ALB and ECS health checks both hit this route)
+- Write `Dockerfile`:
+  - Base: `python:3.12-slim`
+  - Create non-root user `appuser`
+  - Use `uv export --no-emit-project` → `requirements.txt` → `uv pip install --system`
+    (avoids a `.venv` inside the container — the container is already isolated)
+  - `HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3`
+  - `CMD ["python", "-m", "uvicorn", "genai_model_gateway.main:app", "--host", "0.0.0.0", "--port", "8000"]`
+- Build and test locally:
+  ```bash
+  sudo docker build -t genai-model-gateway:local .
+  sudo docker run -d --name gw-test -p 8002:8000 -e AWS_DEFAULT_REGION=ap-southeast-2 genai-model-gateway:local
+  curl -s http://localhost:8002/health   # expect {"status":"ok"}
+  sudo docker rm -f gw-test
+  ```
+
+---
+
+##### Step 2 — Push image to ECR
+
+```bash
+export AWS_REGION=ap-southeast-2
+export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+export ECR_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/genai-model-gateway
+
+# Create the repository
+aws ecr create-repository \
+  --repository-name genai-model-gateway \
+  --image-tag-mutability IMMUTABLE \
+  --image-scanning-configuration scanOnPush=true \
+  --region $AWS_REGION
+
+# Authenticate, tag, push
+aws ecr get-login-password --region $AWS_REGION | \
+  sudo docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+sudo docker tag genai-model-gateway:local $ECR_URI:v1
+sudo docker push $ECR_URI:v1
+```
+
+---
+
+##### Step 3 — IAM roles
+
+Two roles are required. See [`docs/concepts/ecs_credentials.md`](../../docs/concepts/ecs_credentials.md)
+for a full explanation of why both exist and how boto3 picks up credentials automatically.
+
+**Task execution role** (ECS agent — pulls image, writes logs):
+```bash
+aws iam create-role --role-name ecsTaskExecutionRole \
+  --assume-role-policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ecs-tasks.amazonaws.com"},"Action":"sts:AssumeRole"}]}'
+aws iam attach-role-policy --role-name ecsTaskExecutionRole \
+  --policy-arn arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+```
+
+**Task role** (application code — Bedrock, DynamoDB, AppConfig, CloudWatch):
+- Policy: `GenAIGatewayTaskPolicy` — scoped to the 3 inference profile ARNs + Mistral fallback,
+  the `model-gateway-breaker` DynamoDB table, the `routing-profile` AppConfig profile,
+  and `cloudwatch:PutMetricData` with a namespace condition (`GenAIGateway` only).
+- Role: `genai-gateway-task-role` with `ecs-tasks.amazonaws.com` trust + `aws:SourceAccount` condition.
+
+---
+
+##### Step 4 — ECS cluster, task definition, and Fargate service
+
+**CloudWatch log group** (container stdout goes here):
+```bash
+aws logs create-log-group --log-group-name /ecs/genai-model-gateway --region $AWS_REGION
+```
+
+**ECS cluster:**
+```bash
+aws ecs create-cluster --cluster-name genai-gateway --region $AWS_REGION
+```
+
+**Task definition** — key fields:
+- Network mode: `awsvpc` (required for Fargate)
+- CPU: `256` (0.25 vCPU) / Memory: `512` MB
+- Task role: `genai-gateway-task-role`
+- Execution role: `ecsTaskExecutionRole`
+- Container image: `$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/genai-model-gateway:v1`
+- Port: `8000`
+- Environment: `AWS_DEFAULT_REGION=ap-southeast-2`
+- Log driver: `awslogs` → group `/ecs/genai-model-gateway`, prefix `gateway`
+
+**Fargate service:**
+```bash
+# Get default VPC and two subnets
+VPC_ID=$(aws ec2 describe-vpcs --filters Name=isDefault,Values=true \
+  --query "Vpcs[0].VpcId" --output text --region $AWS_REGION)
+SUBNET_IDS=$(aws ec2 describe-subnets --filters Name=vpc-id,Values=$VPC_ID \
+  --query "Subnets[:2].SubnetId" --output text --region $AWS_REGION | tr '\t' ',')
+
+# Task security group — port 8000 (later tightened to ALB SG only)
+SG_ID=$(aws ec2 create-security-group --group-name genai-gateway-task-sg \
+  --description "ECS task SG" --vpc-id $VPC_ID --region $AWS_REGION --query GroupId --output text)
+aws ec2 authorize-security-group-ingress --group-id $SG_ID \
+  --protocol tcp --port 8000 --cidr 0.0.0.0/0 --region $AWS_REGION
+
+aws ecs create-service \
+  --cluster genai-gateway \
+  --service-name genai-model-gateway \
+  --task-definition genai-model-gateway \
+  --desired-count 1 \
+  --launch-type FARGATE \
+  --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],securityGroups=[$SG_ID],assignPublicIp=ENABLED}" \
+  --region $AWS_REGION
+```
+
+Verify the task is running:
+```bash
+aws ecs describe-services --cluster genai-gateway --services genai-model-gateway \
+  --region $AWS_REGION \
+  --query "services[0].{status:status,running:runningCount,desired:desiredCount}"
+```
+
+---
+
+##### Step 5 — ALB, target group, and listener
+
+This step wires public traffic to the running ECS task. Five sub-steps, all in the console.
+Every sub-step matters — skipping one breaks the chain.
+
+```
+Internet → ALB SG (port 80) → ALB → Target Group (port 8000, type=ip) → Task IP:8000
+                                                                              ↑
+                                                        Task SG: allow 8000 from ALB SG only
+```
+
+**Why target type `ip` and not `instance`:** Fargate tasks use `awsvpc` networking — each
+task gets its own private IP attached directly to the VPC. There is no EC2 instance behind
+it. The ALB registers the task's IP in the target group directly.
+
+**Sub-step 1 — ALB security group**
+EC2 → Security Groups → Create security group
+- Name: `genai-gateway-alb-sg`
+- VPC: your default VPC
+- Inbound: Type **HTTP**, Port **80**, Source **0.0.0.0/0**
+
+**Sub-step 2 — Target group**
+EC2 → Target Groups → Create target group
+- Target type: **IP addresses** (not Instance)
+- Name: `genai-gateway-tg`
+- Protocol: **HTTP**, Port: **8000**
+- VPC: your default VPC
+- Health check path: `/health`
+- Healthy threshold: **2**, Interval: **30s**
+- Next → skip manual registration → Create
+
+**Sub-step 3 — Application Load Balancer**
+EC2 → Load Balancers → Create load balancer → Application Load Balancer
+- Name: `genai-gateway-alb`
+- Scheme: **Internet-facing**, IP type: **IPv4**
+- VPC: your default VPC, tick **both subnets**
+- Security groups: remove default, add **`genai-gateway-alb-sg`**
+- Listener: HTTP port **80**, forward to **`genai-gateway-tg`**
+- Create
+
+**Sub-step 4 — Tighten the task security group**
+EC2 → Security Groups → `genai-gateway-task-sg` → Edit inbound rules
+- Delete the existing rule (port 8000 from 0.0.0.0/0)
+- Add: Type **Custom TCP**, Port **8000**, Source → **`genai-gateway-alb-sg`**
+- Save
+
+This ensures the container is unreachable from the internet directly — only the ALB can
+talk to it on port 8000.
+
+**Sub-step 5 — Attach the target group to the ECS service**
+ECS → Clusters → `genai-gateway` → Services → `genai-model-gateway` → Update
+- Load balancing → Add load balancer:
+  - Type: **Application Load Balancer**
+  - Load balancer: **`genai-gateway-alb`**
+  - Container: **`gateway 8000`**
+  - Target group: **`genai-gateway-tg`**
+- Update
+
+ECS deregisters the old task and registers the replacement with the ALB automatically.
+Wait ~60 seconds for `running: 1` to return, then proceed to the smoke test.
+
+---
+
+##### Step 6 — Smoke test
+
+```bash
+# Get the ALB DNS name
+ALB_DNS=$(aws elbv2 describe-load-balancers \
+  --names genai-gateway-alb --region $AWS_REGION \
+  --query "LoadBalancers[0].DNSName" --output text)
+
+curl -s http://$ALB_DNS/health
+# expect: {"status":"ok"}
+
+curl -s -X POST http://$ALB_DNS/v1/generate \
+  -H "Content-Type: application/json" \
+  -d '{"task":"summarize","messages":[{"role":"user","content":"Summarise: AWS ECS runs containers."}]}'
+```
 
 ---
 
 ### Milestone 8 — Well-Architected review
-**AWS cost:** Well-Architected Tool is free  
+**AWS cost:** Well-Architected Tool is free
+
+#### Why this matters — a concrete scenario
+
+You've built and deployed the gateway. It works. But "it works" is not the same as
+"it's production-ready." Security gaps, missing backup strategies, and unmonitored cost
+spikes are invisible until they cause an incident.
+
+The AWS Well-Architected Tool gives you a structured checklist — written by AWS solutions
+architects — that surfaces exactly these gaps. For the AIP-C01 exam, the Generative AI Lens
+questions map directly to what you've built: model selection evidence, fallback strategy,
+guardrails, cost attribution. Answering them honestly is a forcing function to fix the
+worst gaps before shipping.
+
+#### How it works
+
+The Well-Architected Tool is a questionnaire inside the AWS console. You create a
+**workload** (a named snapshot of your system), answer questions across five pillars
+(Operational Excellence, Security, Reliability, Performance, Cost), and the tool produces
+a prioritised list of findings — high/medium/low risk — with AWS-recommended remediation
+steps for each.
+
+The **Generative AI Lens** adds GenAI-specific questions on top of the base framework:
+
+```
+Base framework questions (all workloads):
+  Security:      Is the task role least-privilege?
+  Reliability:   Is there a fallback when the primary model is unavailable?
+  Cost:          Can you attribute spend per feature?
+
+Generative AI Lens additions:
+  Model selection: Is model choice backed by evaluation data?
+  Safety:          Are guardrails applied before model output reaches users?
+  Data privacy:    Is user data logged in a way that complies with your data policy?
+```
+
+The **milestone** feature takes a snapshot of your answers at a point in time. You save
+`pre-review` before fixing anything, then `post-review` after. The tool diffs them and
+shows what improved — this is the evidence you present in a real-world architecture review.
+
+```
+Create workload
+    │
+    ├─ Answer all questions → save milestone "pre-review"
+    │
+    ├─ Review findings list (sorted by risk)
+    │
+    ├─ Fix the two highest-risk items
+    │
+    └─ Re-answer affected questions → save milestone "post-review"
+                                          │
+                                          └─ Tool shows: N risks resolved ✓
+```
+
+#### What changes
+
+| File | What changes |
+|---|---|
+| AWS | Well-Architected workload created, Generative AI Lens applied |
+| Code/infra | Fixes for the two highest-risk findings (discovered during review) |
+| Docs | `docs/well-architected-review.md` — findings summary and what was fixed |
+
+#### Implementation checklist
 
 1. Create a workload in the AWS Well-Architected Tool
 2. Apply the **Generative AI Lens**
 3. Answer all questions honestly for the current state of the service
 4. Save a milestone named `pre-review`
-5. Identify and fix the two worst findings
+5. Identify and fix the two highest-risk findings
 6. Save a second milestone named `post-review`
-
-This practices real-world architectural discipline and is directly exam-relevant for Domain 1.
+7. Write `docs/well-architected-review.md` — what the top findings were and how they were addressed
 
 ---
 

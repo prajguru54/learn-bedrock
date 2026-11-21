@@ -1,0 +1,92 @@
+[
+  {
+    "id": "summarize_001",
+    "task": "summarize",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Summarize this support ticket in 2\u20133 sentences:\n\nTicket #4521 \u2014 Customer: Jane Doe\nSubmitted: 2024-11-14\nSubject: Charged twice for the same subscription\n\nI noticed two charges of $49.99 on my credit card on November 1st and November 3rd. I only have one active Business Plan subscription and I did not upgrade or make any changes. I have attached my bank statement. I need a refund for the duplicate charge immediately and I have already filed a dispute with my bank.\n\nPriority: High | Tags: billing, duplicate-charge, refund"
+      }
+    ]
+  },
+  {
+    "id": "summarize_002",
+    "task": "summarize",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Summarize this support ticket in 2\u20133 sentences:\n\nTicket #4788 \u2014 Customer: Raj Patel\nSubmitted: 2024-11-15\nSubject: Two-factor authentication codes not arriving\n\nI set up 2FA last week with my phone number +1-555-0192. Since this morning I am not receiving the SMS codes at all. I tried resending 3 times. I need to log in urgently for a client presentation. I checked my phone signal \u2014 it is fine. I also tried a different browser. Nothing works. Please help ASAP.\n\nPriority: Critical | Tags: auth, 2fa, login-blocked"
+      }
+    ]
+  },
+  {
+    "id": "summarize_003",
+    "task": "summarize",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Summarize this support ticket in 2\u20133 sentences:\n\nTicket #5012 \u2014 Customer: Acme Corp (via API)\nSubmitted: 2024-11-15\nSubject: Intermittent 429 errors on /reports endpoint\n\nSince the November 14 platform update we are receiving sporadic HTTP 429 responses from your /reports/generate endpoint. This happens roughly every 10th request even though we are well within our stated 1000 req/min quota. Our API key is active and unchanged. The 429 body contains 'burst_limit_exceeded' rather than 'rate_limit_exceeded'. We have not changed our request patterns. This is breaking our nightly batch job.\n\nPriority: High | Tags: api, rate-limit, regression"
+      }
+    ]
+  },
+  {
+    "id": "draft_001",
+    "task": "draft",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Draft a professional reply email to this customer complaint about a billing error:\n\nCustomer: Jane Doe | Issue: Charged twice ($49.99) on the same subscription on Nov 1 and Nov 3.\n\nAction taken: Duplicate charge confirmed. Refund of $49.99 initiated today, expected 5\u20137 business days. Apology offered. No further action needed from customer."
+      }
+    ]
+  },
+  {
+    "id": "draft_002",
+    "task": "draft",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Draft a concise follow-up email to send 48 hours after a product demo:\n\nProspect: Sarah Kim, Head of Operations at NovaCorp\nDemo date: 2024-11-14\nTopics covered: Workflow automation, reporting dashboard, Slack integration\nNext step agreed: Sarah will share the tool internally and reply by Nov 20 with questions\nTone: Friendly and professional, not pushy"
+      }
+    ]
+  },
+  {
+    "id": "draft_003",
+    "task": "draft",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Draft a customer-facing email announcing planned maintenance downtime:\n\nScheduled window: Saturday 2024-11-23, 02:00\u201305:00 UTC\nImpact: The app will be read-only. No data will be lost. API calls will return HTTP 503 with Retry-After header.\nReason: Database infrastructure upgrade\nTone: Clear, calm, apologetic for inconvenience"
+      }
+    ]
+  },
+  {
+    "id": "answer_001",
+    "task": "answer",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Answer the user's question using the provided help article context.\n\nUser question: How do I reset my password?\n\nContext:\n---\nTo reset your password, click 'Forgot password' on the login page. Enter the email address associated with your account. You will receive a reset link within 2 minutes. The link expires after 30 minutes. If you do not receive the email, check your spam folder or contact support. For accounts using SSO, password reset must be done through your identity provider.\n---"
+      }
+    ]
+  },
+  {
+    "id": "answer_002",
+    "task": "answer",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Answer the user's question using the provided help article context.\n\nUser question: How do I cancel my subscription?\n\nContext:\n---\nYou can cancel your subscription at any time from Settings > Billing > Cancel Plan. Cancellation takes effect at the end of the current billing period \u2014 you retain full access until then. Data is retained for 90 days after cancellation. After 90 days, all data is permanently deleted. To cancel immediately and receive a prorated refund, contact support. Annual plans cancelled within 14 days of renewal are eligible for a full refund.\n---"
+      }
+    ]
+  },
+  {
+    "id": "answer_003",
+    "task": "answer",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Answer the user's question using the provided help article context.\n\nUser question: How long do you keep my data?\n\nContext:\n---\nActive accounts: data is retained indefinitely while the subscription is active. Cancelled accounts: data is retained for 90 days after cancellation, then permanently deleted. Deleted projects: moved to trash immediately, permanently deleted after 30 days unless restored. Log data (audit logs, access logs): retained for 12 months regardless of account status. Backups: daily backups are kept for 30 days. We comply with GDPR data retention obligations.\n---"
+      }
+    ]
+  }
+]

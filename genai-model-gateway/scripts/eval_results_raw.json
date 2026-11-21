@@ -1,0 +1,200 @@
+[
+  {
+    "case_id": "summarize_001",
+    "task": "summarize",
+    "model": "mistral.ministral-3-14b-instruct",
+    "latency_ms": 1766.7,
+    "input_tokens": 137,
+    "output_tokens": 91,
+    "cost_usd": 2.3e-05,
+    "quality_score": 5,
+    "response_preview": "Jane Doe (Ticket #4521) reported being **double-charged $49.99 for her active Business Plan subscription** on November 1"
+  },
+  {
+    "case_id": "summarize_001",
+    "task": "summarize",
+    "model": "amazon.nova-micro-v1:0",
+    "latency_ms": 673.0,
+    "input_tokens": 132,
+    "output_tokens": 54,
+    "cost_usd": 1.2e-05,
+    "quality_score": 5,
+    "response_preview": "Jane Doe has submitted a high-priority ticket expressing concern over being charged twice for her active Business Plan s"
+  },
+  {
+    "case_id": "summarize_002",
+    "task": "summarize",
+    "model": "mistral.ministral-3-14b-instruct",
+    "latency_ms": 1049.0,
+    "input_tokens": 148,
+    "output_tokens": 90,
+    "cost_usd": 2.4e-05,
+    "quality_score": 5,
+    "response_preview": "Customer **Raj Patel** (Ticket #4788) urgently reported that **two-factor authentication SMS codes are not arriving** at"
+  },
+  {
+    "case_id": "summarize_002",
+    "task": "summarize",
+    "model": "amazon.nova-micro-v1:0",
+    "latency_ms": 736.6,
+    "input_tokens": 145,
+    "output_tokens": 87,
+    "cost_usd": 1.7e-05,
+    "quality_score": 5,
+    "response_preview": "Raj Patel submitted a critical support ticket on November 15, 2024, reporting that he is not receiving two-factor authen"
+  },
+  {
+    "case_id": "summarize_003",
+    "task": "summarize",
+    "model": "mistral.ministral-3-14b-instruct",
+    "latency_ms": 950.3,
+    "input_tokens": 175,
+    "output_tokens": 94,
+    "cost_usd": 2.7e-05,
+    "quality_score": 5,
+    "response_preview": "**Summary:** Acme Corp reports **intermittent 429 \"burst_limit_exceeded\" errors** on the `/reports/generate` endpoint si"
+  },
+  {
+    "case_id": "summarize_003",
+    "task": "summarize",
+    "model": "amazon.nova-micro-v1:0",
+    "latency_ms": 710.1,
+    "input_tokens": 175,
+    "output_tokens": 70,
+    "cost_usd": 1.6e-05,
+    "quality_score": 4,
+    "response_preview": "Acme Corp reports intermittent HTTP 429 errors (burst limit exceeded) on the /reports/generate endpoint following a Nove"
+  },
+  {
+    "case_id": "draft_001",
+    "task": "draft",
+    "model": "mistral.ministral-3-14b-instruct",
+    "latency_ms": 2911.6,
+    "input_tokens": 85,
+    "output_tokens": 394,
+    "cost_usd": 4.8e-05,
+    "quality_score": 4,
+    "response_preview": "Here\u2019s a polished and professional draft for your reply email to Jane Doe:  --- **Subject:** Follow-Up on Your Billing C"
+  },
+  {
+    "case_id": "draft_001",
+    "task": "draft",
+    "model": "amazon.nova-micro-v1:0",
+    "latency_ms": 1185.9,
+    "input_tokens": 80,
+    "output_tokens": 255,
+    "cost_usd": 3.9e-05,
+    "quality_score": 4,
+    "response_preview": "Subject: Resolution of Billing Error for Your Subscription  Dear Jane Doe,  Thank you for bringing this matter to our at"
+  },
+  {
+    "case_id": "draft_002",
+    "task": "draft",
+    "model": "mistral.ministral-3-14b-instruct",
+    "latency_ms": 2052.6,
+    "input_tokens": 95,
+    "output_tokens": 252,
+    "cost_usd": 3.5e-05,
+    "quality_score": 4,
+    "response_preview": "Here\u2019s a concise and professional follow-up email for Sarah Kim:  --- **Subject:** Quick Follow-Up on Our Demo  Hi Sarah"
+  },
+  {
+    "case_id": "draft_002",
+    "task": "draft",
+    "model": "amazon.nova-micro-v1:0",
+    "latency_ms": 864.0,
+    "input_tokens": 87,
+    "output_tokens": 151,
+    "cost_usd": 2.4e-05,
+    "quality_score": 4,
+    "response_preview": "Subject: Follow-Up on Our Demo on November 14  Hi Sarah,  I hope this email finds you well.  I wanted to touch base 48 h"
+  },
+  {
+    "case_id": "draft_003",
+    "task": "draft",
+    "model": "mistral.ministral-3-14b-instruct",
+    "latency_ms": 2643.1,
+    "input_tokens": 94,
+    "output_tokens": 356,
+    "cost_usd": 4.5e-05,
+    "quality_score": 4,
+    "response_preview": "**Subject:** Scheduled Maintenance \u2013 Temporary App Downtime on Nov 23  Hi [Team/Users],  We wanted to give you a heads-u"
+  },
+  {
+    "case_id": "draft_003",
+    "task": "draft",
+    "model": "amazon.nova-micro-v1:0",
+    "latency_ms": 1305.6,
+    "input_tokens": 88,
+    "output_tokens": 356,
+    "cost_usd": 5.3e-05,
+    "quality_score": 3,
+    "response_preview": "Subject: Important: Scheduled Maintenance on November 23, 2024  Dear valued customer,  We hope this email finds you well"
+  },
+  {
+    "case_id": "answer_001",
+    "task": "answer",
+    "model": "mistral.ministral-3-14b-instruct",
+    "latency_ms": 1244.0,
+    "input_tokens": 107,
+    "output_tokens": 113,
+    "cost_usd": 2.2e-05,
+    "quality_score": 4,
+    "response_preview": "To reset your password:  1. On the login page, click the **\"Forgot password\"** option. 2. Enter the email address linked"
+  },
+  {
+    "case_id": "answer_001",
+    "task": "answer",
+    "model": "amazon.nova-micro-v1:0",
+    "latency_ms": 887.4,
+    "input_tokens": 104,
+    "output_tokens": 140,
+    "cost_usd": 2.3e-05,
+    "quality_score": 4,
+    "response_preview": "To reset your password, follow these steps:  1. Navigate to the login page and click on 'Forgot password'. 2. Enter the "
+  },
+  {
+    "case_id": "answer_002",
+    "task": "answer",
+    "model": "mistral.ministral-3-14b-instruct",
+    "latency_ms": 1254.0,
+    "input_tokens": 119,
+    "output_tokens": 126,
+    "cost_usd": 2.5e-05,
+    "quality_score": 4,
+    "response_preview": "To cancel your subscription, follow these steps:  1. Go to **Settings**. 2. Navigate to **Billing**. 3. Select **Cancel "
+  },
+  {
+    "case_id": "answer_002",
+    "task": "answer",
+    "model": "amazon.nova-micro-v1:0",
+    "latency_ms": 767.6,
+    "input_tokens": 115,
+    "output_tokens": 128,
+    "cost_usd": 2.2e-05,
+    "quality_score": 4,
+    "response_preview": "To cancel your subscription, follow these steps:  1. Go to **Settings**. 2. Select **Billing**. 3. Choose **Cancel Plan*"
+  },
+  {
+    "case_id": "answer_003",
+    "task": "answer",
+    "model": "mistral.ministral-3-14b-instruct",
+    "latency_ms": 1362.7,
+    "input_tokens": 125,
+    "output_tokens": 143,
+    "cost_usd": 2.7e-05,
+    "quality_score": 4,
+    "response_preview": "Based on the provided context, your data is retained as follows:  - **Active accounts**: Your data is kept **indefinitel"
+  },
+  {
+    "case_id": "answer_003",
+    "task": "answer",
+    "model": "amazon.nova-micro-v1:0",
+    "latency_ms": 716.2,
+    "input_tokens": 120,
+    "output_tokens": 122,
+    "cost_usd": 2.1e-05,
+    "quality_score": 5,
+    "response_preview": "If you have an active account with a subscription, your data is retained indefinitely as long as your subscription is ac"
+  }
+]

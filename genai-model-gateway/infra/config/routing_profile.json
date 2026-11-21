@@ -1,0 +1,28 @@
+{
+  "tasks": {
+    "summarize": {
+      "models": [
+        "arn:aws:bedrock:ap-southeast-2:415744340135:application-inference-profile/pj4kpzyk2sjx"
+      ],
+      "fallbacks": ["mistral.ministral-3-3b-instruct"],
+      "maxTokens": 512,
+      "temperature": 0.0
+    },
+    "draft": {
+      "models": [
+        "arn:aws:bedrock:ap-southeast-2:415744340135:application-inference-profile/o25xwte95y5w"
+      ],
+      "fallbacks": ["mistral.ministral-3-3b-instruct"],
+      "maxTokens": 512,
+      "temperature": 0.7
+    },
+    "answer": {
+      "models": [
+        "arn:aws:bedrock:ap-southeast-2:415744340135:application-inference-profile/we7dyxlwu9zk"
+      ],
+      "fallbacks": ["mistral.ministral-3-3b-instruct"],
+      "maxTokens": 512,
+      "temperature": 0.0
+    }
+  }
+}
