@@ -16,31 +16,24 @@ The repository also tracks preparation for the **AWS Certified Generative AI Dev
 | Project | Purpose | Main AWS and application technologies |
 |---|---|---|
 | [GenAI Model Gateway](./genai-model-gateway/) | FastAPI gateway for Bedrock tasks with dynamic routing, fallback, a DynamoDB-backed circuit breaker, and CloudWatch metrics | Bedrock, AppConfig, DynamoDB, ECS Fargate, ALB, ECR, CloudWatch, CDK |
-| [Amazon Bedrock for Beginners](./sample-amazon-bedrock-for-beginners/) | Companion examples for learning the Converse API, conversation history, tool use, RAG, Guardrails, and Strands Agents | Bedrock, S3, Knowledge Bases, Titan embeddings, Guardrails, Strands Agents |
 
 Additional directories:
 
-- [`customer-chatbot/`](./customer-chatbot/) is reserved for an independent chatbot project.
-- [`docs/`](./docs/) contains repository documentation and learning material.
-- [`prompts/`](./prompts/) contains prompts and supporting learning content.
+- [`docs/`](./docs/) contains certification study material and domain documentation.
+- [`prompts/`](./prompts/) contains reusable study-plan and documentation prompts.
 - [AIP-C01 Exam Guide](./aip_01_exam_guide.md) provides the certification domain and task reference.
 - [Developer Background](./my_background.md) describes the learning approach and prior experience.
 
 ## Recommended Learning Path
 
-1. Start with the examples in **Amazon Bedrock for Beginners**:
-   - Call a foundation model with the Converse API.
-   - Maintain multi-turn conversation history.
-   - Implement tool use.
-   - Query a Bedrock Knowledge Base for RAG.
-   - Apply Guardrails.
-   - Combine the pieces in a Strands Agents example.
-2. Continue with the **GenAI Model Gateway**:
+1. Review the **AIP-C01 exam guide** and the topic-specific material in [`docs/`](./docs/).
+2. Build and study the **GenAI Model Gateway**:
    - Route tasks by configuration.
    - Add fallback and circuit-breaker behavior.
    - Package the service in Docker.
    - Deploy it with AWS CDK to ECS Fargate.
    - Evaluate latency and publish operational metrics.
+3. Add new deployable projects incrementally so each project remains independently runnable and deployable.
 
 Each project should be developed and run independently. This repository does not use a root-level Python workspace.
 
@@ -62,15 +55,6 @@ python --version
 uv --version
 aws --version
 aws sts get-caller-identity
-```
-
-For beginner examples that do not use AWS CDK:
-
-```bash
-cd sample-amazon-bedrock-for-beginners
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
 ```
 
 For the model gateway:

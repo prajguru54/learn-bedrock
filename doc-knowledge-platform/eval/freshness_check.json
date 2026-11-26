@@ -1,0 +1,8 @@
+{
+  "question": "How many weeks of paid parental leave does a primary caregiver get?",
+  "asker_department": "hr",
+  "doc": "hr/leave-policy.pdf",
+  "page": 3,
+  "answer_contains_v1": "12 weeks",
+  "answer_contains_v2": "16 weeks"
+}

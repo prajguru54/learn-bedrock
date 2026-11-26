@@ -18,3 +18,4 @@ cdk.out/
 .env
 .local/handoffs/
 docs/codemie/
+.local/conversations

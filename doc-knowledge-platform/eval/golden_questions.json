@@ -1,0 +1,392 @@
+[
+  {
+    "id": "q01",
+    "question": "How many days of annual leave do full-time employees get each year?",
+    "asker_department": "hr",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "hr/leave-policy.pdf",
+    "answer_contains": "20 days of annual leave",
+    "expected_page": 1
+  },
+  {
+    "id": "q02",
+    "question": "How many paid sick days do I get per calendar year?",
+    "asker_department": "hr",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "hr/leave-policy.pdf",
+    "answer_contains": "10 days of paid sick leave",
+    "expected_page": 2
+  },
+  {
+    "id": "q03",
+    "question": "How many weeks of paid parental leave does a primary caregiver get?",
+    "asker_department": "hr",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "hr/leave-policy.pdf",
+    "answer_contains": "12 weeks",
+    "expected_page": 3
+  },
+  {
+    "id": "q04",
+    "question": "How many unused annual leave days can I carry over, and when do they expire?",
+    "asker_department": "hr",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "hr/leave-policy.pdf",
+    "answer_contains": "31 March",
+    "expected_page": 4
+  },
+  {
+    "id": "q05",
+    "question": "What is the one-off home office stipend for remote work?",
+    "asker_department": "sales",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "company-wide/remote-work-policy.pdf",
+    "answer_contains": "AUD 600",
+    "expected_page": 2
+  },
+  {
+    "id": "q06",
+    "question": "How many days a year can I work from another country?",
+    "asker_department": "finance",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "company-wide/remote-work-policy.pdf",
+    "answer_contains": "20 working days",
+    "expected_page": 3
+  },
+  {
+    "id": "q07",
+    "question": "How long is the probation period for new employees?",
+    "asker_department": "hr",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "hr/onboarding-guide.pdf",
+    "answer_contains": "probation period of 6 months",
+    "expected_page": 2
+  },
+  {
+    "id": "q08",
+    "question": "How long does a performance improvement plan last?",
+    "asker_department": "hr",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "hr/performance-review-process.pdf",
+    "answer_contains": "lasting 60 days",
+    "expected_page": 2
+  },
+  {
+    "id": "q09",
+    "question": "How often are performance reviews held?",
+    "asker_department": "hr",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "hr/performance-review-process.pdf",
+    "answer_contains": "twice a year",
+    "expected_page": 1
+  },
+  {
+    "id": "q10",
+    "question": "What is the daily meal limit for domestic travel?",
+    "asker_department": "finance",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "finance/expense-policy.pdf",
+    "answer_contains": "AUD 75 for domestic",
+    "expected_page": 1
+  },
+  {
+    "id": "q11",
+    "question": "Who has to approve an expense over AUD 5,000?",
+    "asker_department": "finance",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "finance/expense-policy.pdf",
+    "answer_contains": "CFO",
+    "expected_page": 2
+  },
+  {
+    "id": "q12",
+    "question": "How many days do I have to submit an expense claim?",
+    "asker_department": "finance",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "finance/expense-policy.pdf",
+    "answer_contains": "within 30 days",
+    "expected_page": 3
+  },
+  {
+    "id": "q13",
+    "question": "How many quotes do I need for a purchase between AUD 2,000 and AUD 20,000?",
+    "asker_department": "finance",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "finance/procurement-policy.pdf",
+    "answer_contains": "two quotes",
+    "expected_page": 1
+  },
+  {
+    "id": "q14",
+    "question": "How long does it take to onboard a new vendor?",
+    "asker_department": "finance",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "finance/procurement-policy.pdf",
+    "answer_contains": "10 business days",
+    "expected_page": 2
+  },
+  {
+    "id": "q15",
+    "question": "When are departmental budget submissions due?",
+    "asker_department": "finance",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "finance/budget-cycle.pdf",
+    "answer_contains": "15 March",
+    "expected_page": 1
+  },
+  {
+    "id": "q16",
+    "question": "How long do we keep contracts after they end?",
+    "asker_department": "legal",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "legal/data-retention-policy.pdf",
+    "answer_contains": "7 years after they expire",
+    "expected_page": 1
+  },
+  {
+    "id": "q17",
+    "question": "Which state's law governs our standard mutual NDA?",
+    "asker_department": "legal",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "legal/nda-template.pdf",
+    "answer_contains": "New South Wales",
+    "expected_page": 2
+  },
+  {
+    "id": "q18",
+    "question": "What liability cap do we accept in vendor contracts?",
+    "asker_department": "legal",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "legal/vendor-contract-guidelines.pdf",
+    "answer_contains": "12 months of fees",
+    "expected_page": 1
+  },
+  {
+    "id": "q19",
+    "question": "How quickly must we respond to an inbound lead?",
+    "asker_department": "sales",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "sales/sales-playbook.pdf",
+    "answer_contains": "4 business hours",
+    "expected_page": 1
+  },
+  {
+    "id": "q20",
+    "question": "By what time on Monday must the commit forecast be submitted?",
+    "asker_department": "sales",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "sales/sales-playbook.pdf",
+    "answer_contains": "10am",
+    "expected_page": 2
+  },
+  {
+    "id": "q21",
+    "question": "What discount can a sales manager approve on their own?",
+    "asker_department": "sales",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "sales/discount-approval-policy.pdf",
+    "answer_contains": "up to 20%",
+    "expected_page": 1
+  },
+  {
+    "id": "q22",
+    "question": "How soon do I have to report a lost laptop?",
+    "asker_department": "legal",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "company-wide/security-awareness.pdf",
+    "answer_contains": "within 1 hour",
+    "expected_page": 3
+  },
+  {
+    "id": "q23",
+    "question": "What is the minimum password length?",
+    "asker_department": "hr",
+    "modality": "pdf",
+    "expect": "ANSWER",
+    "expected_doc": "company-wide/security-awareness.pdf",
+    "answer_contains": "14 characters",
+    "expected_page": 1
+  },
+  {
+    "id": "q24",
+    "question": "What mileage rate is shown on the expense claim form?",
+    "asker_department": "finance",
+    "modality": "scan",
+    "expect": "ANSWER",
+    "expected_doc": "finance/expense-form-scan.pdf",
+    "answer_contains": "0.96",
+    "expected_page": 1
+  },
+  {
+    "id": "q25",
+    "question": "What do I need if I lose a receipt for more than AUD 100?",
+    "asker_department": "finance",
+    "modality": "scan",
+    "expect": "ANSWER",
+    "expected_doc": "finance/receipt-policy-scan.pdf",
+    "answer_contains": "statutory declaration",
+    "expected_page": 2
+  },
+  {
+    "id": "q26",
+    "question": "How long is a job offer letter valid for?",
+    "asker_department": "hr",
+    "modality": "scan",
+    "expect": "ANSWER",
+    "expected_doc": "hr/offer-letter-template-scan.pdf",
+    "answer_contains": "7 days",
+    "expected_page": 1
+  },
+  {
+    "id": "q27",
+    "question": "What is the annual rent for the Sydney office?",
+    "asker_department": "legal",
+    "modality": "scan",
+    "expect": "ANSWER",
+    "expected_doc": "legal/office-lease-summary-scan.pdf",
+    "answer_contains": "840,000",
+    "expected_page": 2
+  },
+  {
+    "id": "q28",
+    "question": "Where is the fire assembly point?",
+    "asker_department": "sales",
+    "modality": "scan",
+    "expect": "ANSWER",
+    "expected_doc": "company-wide/fire-safety-notice-scan.pdf",
+    "answer_contains": "Car park B",
+    "expected_page": 1
+  },
+  {
+    "id": "q29",
+    "question": "What is the APAC price for Premium Support at the Enterprise tier?",
+    "asker_department": "sales",
+    "modality": "csv",
+    "expect": "ANSWER",
+    "expected_doc": "sales/pricing-2025.csv",
+    "answer_contains": "Premium Support,Enterprise,APAC,20700",
+    "expected_row": 14
+  },
+  {
+    "id": "q30",
+    "question": "What discount percentage does a Gold partner get?",
+    "asker_department": "sales",
+    "modality": "csv",
+    "expect": "ANSWER",
+    "expected_doc": "sales/partner-discounts-2025.csv",
+    "answer_contains": "Gold,250000,15,2",
+    "expected_row": 3
+  },
+  {
+    "id": "q31",
+    "question": "Who owns cost centre CC-4410?",
+    "asker_department": "finance",
+    "modality": "csv",
+    "expect": "ANSWER",
+    "expected_doc": "finance/cost-centers.csv",
+    "answer_contains": "Marcus Chen",
+    "expected_row": 10
+  },
+  {
+    "id": "q32",
+    "question": "What is the nightly hotel limit in Sydney?",
+    "asker_department": "sales",
+    "modality": "text",
+    "expect": "ANSWER",
+    "expected_doc": "company-wide/travel-faq.md",
+    "answer_contains": "AUD 280",
+    "expected_section": "Hotel limits"
+  },
+  {
+    "id": "q33",
+    "question": "How much is the yearly wellbeing allowance?",
+    "asker_department": "hr",
+    "modality": "text",
+    "expect": "ANSWER",
+    "expected_doc": "hr/benefits-faq.md",
+    "answer_contains": "AUD 400",
+    "expected_section": "Wellbeing allowance"
+  },
+  {
+    "id": "q34",
+    "question": "How quickly must a suspected data breach be reported internally?",
+    "asker_department": "legal",
+    "modality": "text",
+    "expect": "ANSWER",
+    "expected_doc": "legal/privacy-notes.txt",
+    "answer_contains": "within 24 hours",
+    "expected_section": "DATA BREACH NOTIFICATION"
+  },
+  {
+    "id": "q35",
+    "question": "How fast must support respond to a Severity 1 issue?",
+    "asker_department": "sales",
+    "modality": "text",
+    "expect": "ANSWER",
+    "expected_doc": "sales/customer-escalation.md",
+    "answer_contains": "within 15 minutes",
+    "expected_section": "Severity 1"
+  },
+  {
+    "id": "q36",
+    "question": "Show me the finance expense limits.",
+    "asker_department": "hr",
+    "modality": "pdf",
+    "expect": "NO_RESULT",
+    "forbidden_doc": "finance/expense-policy.pdf"
+  },
+  {
+    "id": "q37",
+    "question": "What is the data retention period for contracts?",
+    "asker_department": "finance",
+    "modality": "pdf",
+    "expect": "NO_RESULT",
+    "forbidden_doc": "legal/data-retention-policy.pdf"
+  },
+  {
+    "id": "q38",
+    "question": "How many weeks of parental leave does a primary caregiver get?",
+    "asker_department": "sales",
+    "modality": "pdf",
+    "expect": "NO_RESULT",
+    "forbidden_doc": "hr/leave-policy.pdf"
+  },
+  {
+    "id": "q39",
+    "question": "What does the office lease cost per year?",
+    "asker_department": "sales",
+    "modality": "scan",
+    "expect": "NO_RESULT",
+    "forbidden_doc": "legal/office-lease-summary-scan.pdf"
+  },
+  {
+    "id": "q40",
+    "question": "What discount does a Gold partner get?",
+    "asker_department": "hr",
+    "modality": "csv",
+    "expect": "NO_RESULT",
+    "forbidden_doc": "sales/partner-discounts-2025.csv"
+  }
+]
