@@ -1,4 +1,4 @@
-# Create a domain study guide
+# Task: Create a domain study guide
 
 Use this prompt to build a book-style study guide for one domain of the AWS Certified Generative AI Developer - Professional (AIP-C01) exam, in the same format as the Domain 1 guide.
 
@@ -12,7 +12,7 @@ Replace `N` with the domain number (2 to 5). No other input is needed. Work from
 
 ## 0. What you are producing
 
-One standalone HTML file, `docs/aip-c01-domain{N}-study-guide.html`, that the reader can open locally and read like a book. It must contain:
+One standalone HTML file, `docs/domain/aip-c01-domain{N}-study-guide.html`, that the reader can open locally and read like a book. It must contain:
 
 1. A cover with a chapter table and a legend for the callouts.
 2. One **chapter per exam task** in the domain (for example Domain 1 had Tasks 1.1 to 1.6). Add an **Orientation** chapter only if the domain needs prerequisite knowledge that the Domain 1 guide did not already cover. If it does not, link to the Domain 1 guide in the cover paragraph and skip it.
@@ -25,17 +25,17 @@ The reader is described in `my_background.md`: a senior Python backend and GenAI
 
 - One chapter per exam task.
 - Brief refreshers on known concepts. Depth on the AWS-specific layer.
-- Short Boto3 snippets (10 to 30 lines), Python only. Boto3 and native AWS APIs before any framework.
-- Exam-tip callouts, and "Backend analogy" callouts that map AWS ideas to things the reader knows.
-- Hands-on **console labs** wherever a console exercise genuinely exists, so the reader can try the concept quickly.
-- Project workshops with a problem statement, architecture, services and tech, a build path, and a definition of done.
+- Boto3 snippets sized to what the point needs. There is no line limit: a snippet must be complete enough to run or to be understood, and splitting it to hit a number hurts usability. Python is the language for application code. Use other formats where they fit the content (AWS CLI commands, shell, JSON or ASL for state machines, IAM policies, OpenAPI, infrastructure as code). Boto3 and native AWS APIs before any framework.
+- Exam-tip callouts, and "Backend analogy" callouts that map AWS ideas to things the reader knows. Use an analogy callout only where a good one exists. A chapter may have none.
+- Hands-on **labs** that show every action both ways wherever both exist: a **Console path** (clicks) and a **CLI and Boto3 path** (copy-pasteable commands and scripts). This follows the "Implementation Guidance Standards" in `AGENTS.md`. Give only one path when the other does not exist (for example a console-only setting, or an action with no console equivalent), and say so.
+- Project workshops with a problem statement, architecture, services and tech, a build path, and a definition of done. Per-project effort estimates are not required (the project map carries the overall effort guidance).
 - All tasks in a single document.
 
 ## 2. Read these first
 
 1. `AGENTS.md` and `my_background.md` at the repository root (repo rules, reader profile, teaching style).
 2. `aip_01_exam_guide.md`. Locate Domain N, list every task and every numbered skill, and note the domain's percentage weight.
-3. `docs/aip-c01-domain1-study-guide.html` as the **style reference**. Skim the cover, one full chapter, one project workshop, and the project map so that tone, structure, and component use match. Do not copy its content.
+3. `docs/domain/aip-c01-domain1-study-guide.html` as the **style reference**. Skim the cover, one full chapter, one project workshop, and the project map so that tone, structure, and component use match. Do not copy its content.
 4. Any `CLAUDE.md` in the working directory that describes AWS account restrictions (for example a single assigned Region, services unavailable on the plan). Labs and projects must respect these. If none exists, assume a normal account and still flag cost traps.
 5. The `.claude/skills` AWS skills that match the domain (for example `amazon-bedrock`, `aws-sdk-python-usage`, `aws-iam`, `aws-observability`, `aws-security`, `aws-serverless`, `aws-ai-ml`). Load the relevant ones **before** writing, and use them as the source of truth for current service behavior. The `ToolSearch` tool can load `WebSearch` and `WebFetch` for the AWS documentation when a skill is silent.
 
@@ -57,7 +57,7 @@ Fill every `{{PLACEHOLDER}}` in `00-head.html` and `zz-foot.html`:
 | `{{DOC_TITLE}}` | Short document title, two to four words, for example `AIP-C01 Domain 2 Guide` |
 | `{{EYEBROW}}` | `AWS Certified Generative AI Developer – Professional (AIP-C01)` |
 | `{{H1}}` | The domain's full official title |
-| `{{LEDE}}` | Two sentences: the domain's weight and what the guide does (see the Domain 1 cover) |
+| `{{LEDE}}` | A short lede: the domain's weight and what the guide does (see the Domain 1 cover). Length is flexible |
 | `{{COVER_ROWS}}` | One `<tr>` per chapter and per project workshop, in reading order, three cells each: chapter link, exam task, "What you will be able to do". Link targets are the chapter `id` values you will use (`task-N-M`, `project-1`, `project-map`) |
 | `{{STORAGE_PREFIX}}` | A short unique key such as `aip-c01-d2`, used for the saved sidebar state |
 
@@ -91,19 +91,22 @@ Every h3 needs a unique id with a task prefix, for example id="t21-model-calls".
 Use h3 for sections, h4 for subsections, h5 for small labels. No h1. The chapter title is the only h2.
 
 ## Components
-- Callouts (use all kinds, with judgment, not on every paragraph):
+- Callouts (use the kinds that fit, with judgment, not on every paragraph. Skip "Backend analogy" when there is no good analogy):
   <aside class="callout exam"><p class="callout-title">Exam tip</p><p>...</p></aside>
   <aside class="callout analogy"><p class="callout-title">Backend analogy</p><p>...</p></aside>
   <aside class="callout warn"><p class="callout-title">Watch out</p><p>...</p></aside>
   <aside class="callout note"><p class="callout-title">Note</p><p>...</p></aside>
-- Console lab (only where a console exercise genuinely exists):
+- Lab. Show every action both ways wherever both exist (repo rule in AGENTS.md). Console path first, then the CLI and Boto3 path:
   <section class="lab"><p class="callout-title">Hands-on lab</p><h4>Lab title</h4>
     <p class="lab-meta">About 20 minutes · Cost: ... · Needs: ...</p>
+    <h5>Console path</h5>
     <ol class="steps"><li>Open <strong>Amazon Bedrock</strong> console → <strong>Section</strong> ...</li></ol>
+    <h5>CLI and Boto3 path</h5>
+    <ol class="steps"><li>Run <code>aws ...</code> or a short Boto3 script ...</li></ol>
     <p class="cleanup"><strong>Cleanup.</strong> ...</p></section>
-  State cost honestly. Remind the reader to use their selected Region. Always include cleanup.
+  Use real flag names and example values so commands are copy-pasteable. If an action exists on only one path, give that path and say why. State cost honestly. Remind the reader to use their selected Region. Always include cleanup (cleanup also gets a console and a CLI form where both exist).
 - Tables: <div class="table-wrap"><table><thead><tr><th>..</th></tr></thead><tbody>...</tbody></table></div>
-- Code: <pre><code>...</code></pre>. Escape &lt; &gt; &amp;. Python and Boto3 only.
+- Code: <pre><code>...</code></pre>. Escape &lt; &gt; &amp;. Python and Boto3 for application code. Other formats are welcome where they fit the content: AWS CLI and shell, JSON or ASL, IAM policies, OpenAPI, infrastructure as code. No line limit. Prefer one complete, runnable snippet over several fragments.
 - Diagrams: <pre class="mermaid">flowchart LR ...</pre>. The page loads Mermaid itself. Keep diagrams simple and valid.
   QUOTE EVERY node label that contains spaces or punctuation: A["label (with parens)"]. Quote edge labels: -->|"yes"|.
   Aim for 2-4 diagrams per chapter where a picture beats prose.
@@ -120,7 +123,7 @@ Use h3 for sections, h4 for subsections, h5 for small labels. No h1. The chapter
 - Frame "when to choose X over Y" explicitly. The exam asks for the BEST option under cost, latency, operations, and compliance constraints.
 - Prefer concrete numbers, named features, and API or parameter names. If you are not sure a detail is current, say so briefly or describe it generally. Never invent a quota, price, model ID, or console label.
 - Style: plain, direct sentences. No emoji. No em dashes. Avoid "not X but Y" framing and filler such as "it's worth noting".
-- Length: roughly 5,000 to 7,000 words of prose per chapter, excluding code.
+- Length: no fixed word count. Make each chapter as long as the exam skills, the AWS-specific depth, and the labs need, and no longer. For reference, Domain 1 chapters ran roughly 5,000 to 7,000 words of prose.
 
 ## Accuracy
 Load the matching AWS skills before writing and use them as the source of truth. Use the AWS documentation when a skill is silent.
@@ -143,16 +146,20 @@ Place **two or three** workshops between chapters, grouping related tasks so eac
 - `h3` **Solution architecture**: one or two Mermaid diagrams plus prose that walks the data path and names the key decisions and trade-offs.
 - `h3` **Technology and services**: a table with columns Piece, What you use, Why this choice, Read first (links to chapter sections).
 - `h3` **Build path**: a suggested folder name and an `<ol class="milestones">` of 7 to 10 milestones. Each milestone has a bold name, then one or two sentences. Order them so that something works after every step. Include at least one milestone that measures quality, cost, or latency, and one that tests failure.
-- `h3` **Definition of done**: 4 to 6 testable statements.
+- `h3` **Definition of done**: testable statements, as many as the project needs. Each one must be checkable by running something.
 - `h3` **Cost, Region, and account notes**: a `warn` callout with the real cost traps, account limits from section 2, and fallbacks, then a short paragraph on expected spend.
 - A closing `note` callout of **stretch ideas** that point toward later domains.
 
 Rules for projects:
 
 - Each project is independent with its own folder, as in `AGENTS.md`. When a project builds on a Domain 1 project, say to **copy** the needed modules into the new folder and not import across folders.
-- Use Python, FastAPI, Boto3, Docker, and ECS Fargate where a deployment is part of the project, with infrastructure as code in the project's `infra/` folder. Use Boto3 before frameworks.
+- Use Python and Boto3 for application code, and Boto3 before frameworks. Do not fix the deployment target or the infrastructure-as-code tool in advance. In the project's **Technology and services** section, list the realistic options with one line of trade-off each, and mark which one the build path assumes by default, so the reader chooses during implementation. Cover at least:
+  - **Compute and hosting:** AWS Lambda (with or without a container image or Lambda Web Adapter), Amazon ECS on AWS Fargate, ECS on EC2, Amazon EKS, AWS App Runner, Amazon EC2, and Step Functions or other managed orchestration where the project is a workflow. Include Docker image packaging where a container is involved. Drop an option only if the project cannot use it, and say why.
+  - **Infrastructure as code (in the project's `infra/` folder):** Terraform, AWS CDK, AWS SAM, CloudFormation, or console and CLI scripts for a throwaway run.
+  - **Interface to the service:** FastAPI app, API Gateway with Lambda, or a plain script, as the project requires.
+  Never imply that the default is the only valid choice.
 - Do not depend on services that are closed to new customers or deprecated. Verify availability in the skills.
-- Be honest about effort. Give a rough range and label it as an estimate.
+- Per-project effort estimates are not required. If you give one, label it as an estimate. The project map carries the overall effort guidance.
 
 The **project map** chapter (`id="project-map"`) contains: a table mapping every exam skill in the domain to the project and milestone that practices it, a section on the skills the projects leave out and how to cover them instead (reading, a comparison table, a short lab), a suggested order with effort estimates, an optional capstone that combines the projects (with a Mermaid diagram), and one exam-tip callout about recording design decisions.
 
@@ -175,7 +182,7 @@ Create `$PARTS/order.txt`: the fragment file names, one per line, in reading ord
 cd $PARTS
 { ls ch0-*.html 2>/dev/null; ls ch1-*.html; echo p1-project.html; ls ch2-*.html; ... echo pZ-map.html; } > order.txt
 cd - >/dev/null
-python3 prompts/study-guide-template/build_guide.py --parts $PARTS --out docs/aip-c01-domain$N-study-guide.html
+python3 prompts/study-guide-template/build_guide.py --parts $PARTS --out docs/domain/aip-c01-domain$N-study-guide.html
 ```
 
 The script concatenates head, fragments, and foot, wraps the result in a standalone page with the Mermaid loader, and checks tag balance, duplicate ids, broken in-page links, unfilled placeholders, `/tmp` references, em dashes, unquoted Mermaid labels, and the sidebar script syntax. Fix every reported problem in the fragments and rebuild until it exits cleanly.
