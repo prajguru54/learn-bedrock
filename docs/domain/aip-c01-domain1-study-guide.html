@@ -4732,15 +4732,44 @@ Reply with the single word only. No punctuation.
   var layout = document.getElementById('layout');
   var hideBtn = document.getElementById('toc-hide');
   var showBtn = document.getElementById('toc-show');
-  function setHidden(hidden) {
+  /* Hiding the sidebar changes the text width, so the text reflows. Remember which
+     block sits at the top of the window and how far into it we are, then put it
+     back after the toggle so the reading point does not move. */
+  function readingAnchor() {
+    var blocks = document.querySelectorAll('main p, main li, main h2, main h3, main h4, main h5, main pre, main table, main summary');
+    var found = null;
+    for (var i = 0; i < blocks.length; i++) {
+      var r = blocks[i].getBoundingClientRect();
+      if (r.height === 0 || r.bottom <= 0) continue;
+      if (r.top > 0) { if (!found) found = blocks[i]; break; }
+      found = blocks[i];
+    }
+    if (!found) return null;
+    var fr = found.getBoundingClientRect();
+    return { el: found, top: fr.top, frac: fr.top > 0 ? 0 : -fr.top / fr.height };
+  }
+  function restoreAnchor(a) {
+    if (!a) return;
+    var r = a.el.getBoundingClientRect();
+    var want = a.top > 0 ? a.top : -a.frac * r.height;
+    var delta = r.top - want;
+    if (Math.abs(delta) < 1) return;
+    var root = document.documentElement, prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    window.scrollBy(0, delta);
+    root.style.scrollBehavior = prev;
+  }
+  function setHidden(hidden, keepPosition) {
+    var anchor = keepPosition ? readingAnchor() : null;
     layout.classList.toggle('toc-hidden', hidden);
     hideBtn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
     showBtn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
     try { localStorage.setItem(HKEY, hidden ? '1' : '0'); } catch (e) {}
+    restoreAnchor(anchor);
   }
   try { if (localStorage.getItem(HKEY) === '1') setHidden(true); } catch (e) {}
-  hideBtn.addEventListener('click', function () { setHidden(true); showBtn.focus(); });
-  showBtn.addEventListener('click', function () { setHidden(false); hideBtn.focus(); });
+  hideBtn.addEventListener('click', function () { setHidden(true, true); showBtn.focus({ preventScroll: true }); });
+  showBtn.addEventListener('click', function () { setHidden(false, true); hideBtn.focus({ preventScroll: true }); });
 })();
 </script>
 
