@@ -160,3 +160,23 @@ or deploys something — show the console path and the CLI path, one after the o
 **Why:** The developer is new to AWS. Seeing both paths builds a mental model of the
 AWS console layout and the CLI/SDK simultaneously, which is directly useful for the exam
 (scenario questions often describe console workflows) and for day-to-day work.
+
+---
+
+## Commit Message Suggestions
+
+After you change files in this repo, end your reply with a suggested commit message for
+the changes. Do not stage or commit anything yourself unless the user asks for that
+specific action. The message is only a suggestion for the user to use.
+
+- Format: `type(scope): short summary`, with the summary in the imperative mood, about 72
+  characters or fewer. Use the types `feat`, `fix`, `docs`, `refactor`, `test`, `chore`.
+  The scope is optional and is usually the project folder or area, for example `prompts`
+  or `rag-document-search`.
+- Add a body only when it helps: a blank line, then short bullets for what changed and why.
+  Describe the change and its reason, not a list of every file.
+- If the changes cover unrelated things, suggest separate commits, one message each, and
+  say which files belong to each.
+- Leave out files that you did not change. If `git status` shows other modified or
+  untracked files, name them as left out and do not include them in the message.
+- Skip the suggestion when you only answered a question or changed no files.
