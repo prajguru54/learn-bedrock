@@ -50,7 +50,28 @@
   /* ---------- helpers ---------- */
   const $ = (s, r = document) => r.querySelector(s);
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-  const fmt = (s) => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
+  // one-line plain-text preview: drops code fences/backticks, collapses whitespace, truncates
+  const preview = (s, n) => {
+    const t = String(s).replace(/```[a-z]*\n?[\s\S]*?```/g, " [code] ").replace(/`/g, "").replace(/\s+/g, " ").trim();
+    return t.length > n ? t.slice(0, n).trimEnd() + "…" : t;
+  };
+  const inline = (s) => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
+  // supports ```fenced``` blocks (rendered as <pre>) plus inline `code`
+  const fmt = (s) => {
+    const parts = String(s).split(/```(?:[a-z]*)\n?([\s\S]*?)```/);
+    if (parts.length === 1) return inline(s);
+    let out = "";
+    for (let i = 0; i < parts.length; i++) {
+      if (i % 2 === 1) out += `<pre class="code">${esc(parts[i].replace(/\n+$/, ""))}</pre>`;
+      else {
+        let t = parts[i];
+        if (i > 0) t = t.replace(/^\n+/, "");
+        if (i < parts.length - 1) t = t.replace(/\n+$/, "");
+        out += inline(t);
+      }
+    }
+    return out;
+  };
   const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
   const mmss = (s) => { s = Math.max(0, Math.round(s)); const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60; return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(x).padStart(2, "0"); };
@@ -340,7 +361,7 @@
       <p>${n - unans} of ${n} answered · <b class="${unans ? "fail" : "pass"}">${unans} unanswered</b> · ${flagged} flagged. Unanswered questions score as incorrect (no penalty for guessing).</p>
       <table><tr><th>#</th><th>Question</th><th>Status</th><th></th></tr>
       ${sess.qids.map((id, i) => { const g = (sess.answers[id] || []).length;
-        return `<tr class="click" data-act="jump" data-i="${i}"><td>${i + 1}</td><td>${esc(BYID[id].stem.slice(0, 110))}…</td><td>${g ? "Answered" : "<b class='fail'>Unanswered</b>"}</td><td>${sess.flags[id] ? "⚑" : ""}</td></tr>`; }).join("")}</table>
+        return `<tr class="click" data-act="jump" data-i="${i}"><td>${i + 1}</td><td>${esc(preview(BYID[id].stem, 110))}</td><td>${g ? "Answered" : "<b class='fail'>Unanswered</b>"}</td><td>${sess.flags[id] ? "⚑" : ""}</td></tr>`; }).join("")}</table>
       <div class="row" style="margin-top:16px"><button class="btn" data-act="backToTest">← Back to questions</button><button class="btn primary" data-act="submit">Submit test</button></div></div>`;
   }
 
@@ -349,7 +370,7 @@
     const labels = "ABCDEF";
     const ok = isCorrect(q, given);
     const status = !given.length ? "skip" : ok ? "ok" : "no";
-    return `<details class="card rev-q"><summary><span class="dot ${status}"></span><span class="qs"><b>${q.id}</b> ${extra || ""} — ${esc(q.stem.slice(0, 140))}${q.stem.length > 140 ? "…" : ""}</span></summary>
+    return `<details class="card rev-q"><summary><span class="dot ${status}"></span><span class="qs"><b>${q.id}</b> ${extra || ""} — ${esc(preview(q.stem, 140))}</span></summary>
       <div class="stem" style="margin-top:12px">${fmt(q.stem)}</div>
       ${q.choices.map((c) => { const sel = given.includes(c.id), isA = q.answer.includes(c.id);
         const cls = "choice locked " + (q.type === "multi" ? "check" : "radio") + (isA ? " correct" : sel ? " wrong" : "") + (sel ? " sel" : "");
