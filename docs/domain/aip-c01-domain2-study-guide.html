@@ -85,7 +85,8 @@ a.xref:hover { background: var(--accent-soft); text-decoration-style: solid; }
 a:focus-visible, summary:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .layout { display: grid; grid-template-columns: 17rem minmax(0, 1fr); gap: 3rem; max-width: 76rem; margin-inline: auto; align-items: start; }
-@media (max-width: 62rem) { .layout { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+@media (max-width: 62rem) { .layout { grid-template-columns: 14rem minmax(0, 1fr); gap: 1.5rem; } }
+@media (max-width: 40rem) { .layout { grid-template-columns: minmax(0, 1fr); gap: 0; } }
 
 /* Contents sidebar */
 .toc { position: sticky; top: env(safe-area-inset-top, 0px); max-height: 100vh; overflow-y: auto; padding-block: 1.5rem; font-family: var(--font-ui); font-size: 0.8125rem; line-height: 1.4; }
@@ -111,7 +112,7 @@ a:focus-visible, summary:focus-visible, button:focus-visible { outline: 2px soli
 .toc .bulk button:hover { color: var(--accent); border-color: var(--accent); }
 .toc .ch ul a { color: var(--muted); font-weight: 400; }
 .toc .ch ul a.current { color: var(--accent); background: var(--accent-soft); }
-@media (max-width: 62rem) {
+@media (max-width: 40rem) {
   .toc { position: static; max-height: none; border-bottom: 1px solid var(--rule); padding-block: 1rem; }
 }
 
@@ -121,8 +122,8 @@ a:focus-visible, summary:focus-visible, button:focus-visible { outline: 2px soli
 .toc-hide { position: sticky; top: 0.6rem; float: right; margin: -0.4rem 0.15rem 0 0; z-index: 2; }
 .toc-show { display: none; position: fixed; top: calc(env(safe-area-inset-top, 0px) + 0.75rem); left: 0.75rem; z-index: 20; }
 .toc details > summary { padding-right: 2.75rem; }
-@media (max-width: 62rem) { .toc-btn { display: none !important; } }
-@media (min-width: 62.01rem) {
+@media (max-width: 40rem) { .toc-btn { display: none !important; } }
+@media (min-width: 40.01rem) {
   .layout.toc-hidden { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .layout.toc-hidden .toc { display: none; }
   .layout.toc-hidden .toc-show { display: grid; }
@@ -4546,7 +4547,7 @@ EOF</code></pre>
     save();
   });
 
-  var narrow = window.matchMedia('(max-width: 62rem)');
+  var narrow = window.matchMedia('(max-width: 40rem)');
   var details = document.getElementById('toc-details');
   function syncOpen() { details.open = !narrow.matches; }
   syncOpen();
