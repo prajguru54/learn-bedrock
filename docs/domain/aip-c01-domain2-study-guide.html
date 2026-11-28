@@ -80,6 +80,8 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 a { color: var(--accent); text-underline-offset: 2px; }
+a.xref { text-decoration-style: dotted; text-decoration-thickness: 1px; }
+a.xref:hover { background: var(--accent-soft); text-decoration-style: solid; }
 a:focus-visible, summary:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .layout { display: grid; grid-template-columns: 17rem minmax(0, 1fr); gap: 3rem; max-width: 76rem; margin-inline: auto; align-items: start; }
@@ -1582,7 +1584,7 @@ aws sagemaker list-endpoints --query "Endpoints[].EndpointName"   # should no lo
   </header>
 
   <h3 id="t23-mindset">How this task is examined</h3>
-  <p>Task 2.3 questions describe a company, an existing system and a constraint, then ask for an architecture. The constraint decides the answer. Read each scenario with four questions in order.</p>
+  <p><a class="xref" href="#task-2-3" title="Task 2.3 — Design and Implement Enterprise Integration Architectures">Task 2.3</a> questions describe a company, an existing system and a constraint, then ask for an architecture. The constraint decides the answer. Read each scenario with four questions in order.</p>
   <ol>
     <li><strong>Does the caller have to wait for the model?</strong> If yes, you need a synchronous call and you must protect it from slowness. If no, an event or a queue is almost always the better answer.</li>
     <li><strong>What happens when the other side is down?</strong> Anything that must survive an outage needs retries and a place for failed work to land (a dead-letter queue).</li>
@@ -3171,7 +3173,7 @@ aws apigateway delete-rest-api --rest-api-id &lt;api_id&gt;</code></pre>
       <li>A single trace shows where a slow request spent its time.</li>
     </ul>
   </div>
-  <p>These requirements are the exam's Task 2.4 scenarios in order: streaming, asynchronous processing, throttling, routing, validation, observability. Each line below maps to one box in the architecture.</p>
+  <p>These requirements are the exam's <a class="xref" href="#task-2-4" title="Task 2.4 — Implement FM API Integrations">Task 2.4</a> scenarios in order: streaming, asynchronous processing, throttling, routing, validation, observability. Each line below maps to one box in the architecture.</p>
 
   <h3 id="p2-architecture">Solution architecture</h3>
   <pre class="mermaid">flowchart LR
@@ -4302,7 +4304,7 @@ EOF</code></pre>
       <li>For any claim, you can find what was sent to the model, what came back, how many tokens it used, and which team used them.</li>
     </ul>
   </div>
-  <p>The seven lines map to Tasks 2.3 and 2.5 in order. Use synthetic claims only. Invocation logs hold full prompts, so no real personal data belongs in this project.</p>
+  <p>The seven lines map to <a class="xref" href="#task-2-3" title="Task 2.3 — Design and Implement Enterprise Integration Architectures">Tasks 2.3</a> and <a class="xref" href="#task-2-5" title="Task 2.5 — Application Integration Patterns and Development Tools">2.5</a> in order. Use synthetic claims only. Invocation logs hold full prompts, so no real personal data belongs in this project.</p>
 
   <h3 id="p3-architecture">Solution architecture</h3>
   <pre class="mermaid">flowchart LR
@@ -4382,7 +4384,7 @@ EOF</code></pre>
   </header>
 
   <h3 id="p4-coverage">Skill coverage map</h3>
-  <p>P1 is the refund-triage agent (Task 2.1), P2 is the chat and job service with streaming and routing (Tasks 2.2 and 2.4), and P3 is the claims pipeline with a gateway, a release pipeline and an incident drill (Tasks 2.3 and 2.5). "Lab" means a hands-on lab in the chapter. "Reading" means the chapter teaches the skill but nothing you build exercises it. Milestone numbers refer to the Build path of each workshop.</p>
+  <p>P1 is the refund-triage agent (<a class="xref" href="#task-2-1" title="Task 2.1 — Implement Agentic AI Solutions and Tool Integrations">Task 2.1</a>), P2 is the chat and job service with streaming and routing (<a class="xref" href="#task-2-2" title="Task 2.2 — Implement Model Deployment Strategies">Tasks 2.2</a> and <a class="xref" href="#task-2-4" title="Task 2.4 — Implement FM API Integrations">2.4</a>), and P3 is the claims pipeline with a gateway, a release pipeline and an incident drill (<a class="xref" href="#task-2-3" title="Task 2.3 — Design and Implement Enterprise Integration Architectures">Tasks 2.3</a> and <a class="xref" href="#task-2-5" title="Task 2.5 — Application Integration Patterns and Development Tools">2.5</a>). "Lab" means a hands-on lab in the chapter. "Reading" means the chapter teaches the skill but nothing you build exercises it. Milestone numbers refer to the Build path of each workshop.</p>
   <div class="table-wrap"><table>
     <thead><tr><th>Skill</th><th>What it asks</th><th>Practiced in</th></tr></thead>
     <tbody>

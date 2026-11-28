@@ -80,6 +80,8 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 a { color: var(--accent); text-underline-offset: 2px; }
+a.xref { text-decoration-style: dotted; text-decoration-thickness: 1px; }
+a.xref:hover { background: var(--accent-soft); text-decoration-style: solid; }
 a:focus-visible, summary:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .layout { display: grid; grid-template-columns: 17rem minmax(0, 1fr); gap: 3rem; max-width: 76rem; margin-inline: auto; align-items: start; }
@@ -2061,7 +2063,7 @@ aws logs get-query-results --query-id &lt;QUERY_ID_FROM_PREVIOUS_COMMAND&gt;</co
   </header>
 
   <h3 id="pm-coverage">Skill coverage map</h3>
-  <p>P1 is the evaluation and release-gate harness (Task 5.1). P2 is the troubleshooting toolkit (Task 5.2). The milestones are named by theme and listed in build order, so the table points to the step by name.</p>
+  <p>P1 is the evaluation and release-gate harness (<a class="xref" href="#task-5-1" title="Task 5.1 — Implement Evaluation Systems for GenAI">Task 5.1</a>). P2 is the troubleshooting toolkit (<a class="xref" href="#task-5-2" title="Task 5.2 — Troubleshoot GenAI Applications">Task 5.2</a>). The milestones are named by theme and listed in build order, so the table points to the step by name.</p>
   <div class="table-wrap"><table>
     <thead><tr><th>Skill</th><th>What it asks</th><th>Practiced in</th></tr></thead>
     <tbody>

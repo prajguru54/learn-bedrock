@@ -73,6 +73,8 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 a { color: var(--accent); text-underline-offset: 2px; }
+a.xref { text-decoration-style: dotted; text-decoration-thickness: 1px; }
+a.xref:hover { background: var(--accent-soft); text-decoration-style: solid; }
 a:focus-visible, summary:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .layout { display: grid; grid-template-columns: 17rem minmax(0, 1fr); gap: 3rem; max-width: 76rem; margin-inline: auto; align-items: start; }

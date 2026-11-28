@@ -80,6 +80,8 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 a { color: var(--accent); text-underline-offset: 2px; }
+a.xref { text-decoration-style: dotted; text-decoration-thickness: 1px; }
+a.xref:hover { background: var(--accent-soft); text-decoration-style: solid; }
 a:focus-visible, summary:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .layout { display: grid; grid-template-columns: 17rem minmax(0, 1fr); gap: 3rem; max-width: 76rem; margin-inline: auto; align-items: start; }
@@ -2567,7 +2569,7 @@ cw.put_metric_data(Namespace="GenAIApp", MetricData=[{
   </header>
 
   <h3 id="p4-coverage">Skill coverage map</h3>
-  <p>P1 is the cost-aware gateway (Task 4.1), P2 is the low-latency streaming RAG service (Task 4.2), and P3 is the observability stack (Task 4.3). The workshops were written in parallel, so this table points to the <em>theme</em> of each Build path milestone, not its number. Find the milestone by name in the workshop. "Lab" means a hands-on lab in the chapter. "Reading" means the chapter teaches the idea but no build step exercises it.</p>
+  <p>P1 is the cost-aware gateway (<a class="xref" href="#task-4-1" title="Task 4.1 — Implement Cost Optimization and Resource Efficiency Strategies">Task 4.1</a>), P2 is the low-latency streaming RAG service (<a class="xref" href="#task-4-2" title="Task 4.2 — Optimize Application Performance">Task 4.2</a>), and P3 is the observability stack (<a class="xref" href="#task-4-3" title="Task 4.3 — Implement Monitoring Systems for GenAI Applications">Task 4.3</a>). The workshops were written in parallel, so this table points to the <em>theme</em> of each Build path milestone, not its number. Find the milestone by name in the workshop. "Lab" means a hands-on lab in the chapter. "Reading" means the chapter teaches the idea but no build step exercises it.</p>
   <div class="table-wrap"><table>
     <thead><tr><th>Skill</th><th>What it asks</th><th>Practiced in</th></tr></thead>
     <tbody>
